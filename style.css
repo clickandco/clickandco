@@ -555,11 +555,20 @@ body {
     opacity: 1;
     pointer-events: auto;
 }
+/* ค้นหาคลาสนี้ใน SECTION 4 แล้วแก้ให้เป็นแบบนี้ */
 .central-modal {
     width: 100%;
     max-width: 500px;
-    max-height: 85vh;
-    overflow-y: auto;
+    
+    /* 🛠️ แก้ไขจุดนี้: ล็อกความสูงให้พอดีจอมือถือ (หักลบ margin ซ้ายขวา/บนล่าง ออกฝั่งละ 15px รวมเป็น 30px) */
+    height: calc(100vh - 30px); 
+    max-height: calc(100vh - 30px);
+    
+    /* 🛠️ เพิ่มตรงนี้: จัดเรียงเนื้อหาภายในเป็นแนวตั้งเพื่อแยกโซน Scroll */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* ล็อกตัวกล่องหลักไม่ให้เกิด Scrollbar ซ้อน */
+    
     position: relative;
     padding: 25px;
     background: #ffffff !important; 
