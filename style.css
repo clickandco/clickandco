@@ -502,12 +502,23 @@ body {
     top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(0, 0, 0, 0.5); 
     z-index: 1000;
-    display: none;
-    align-items: center;
-    justify-content: center;
     padding: 15px;
     backdrop-filter: blur(8px); 
     -webkit-backdrop-filter: blur(8px);
+    
+    /* 🛠️ แก้ไขจุดนี้: เปลี่ยนจาก display: none เป็นซ่อนแบบโปร่งแสง เพื่อให้ทำ Animation ได้ */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    display: flex; /* ใช้ flex จัดกึ่งกลางค้างไว้ได้เลย */
+    align-items: center;
+    justify-content: center;
+}
+
+/* 🛠️ เพิ่มสถานะเมื่อสั่งเปิด Overlay (เรียกใช้ผ่าน JavaScript เช่น overlay.classList.add('active')) */
+.modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
 }
 .central-modal {
     width: 100%;
@@ -809,4 +820,78 @@ body {
     display: flex;
     align-items: center;
     /* ลบ font-size หรือตัวเก่าที่ทำให้ตำแหน่งเพี้ยนออก (ถ้ามี) */
+}
+/* ==========================================================================
+   SECTION 12: SMOOTH POPUP & MODAL ANIMATIONS (ระบบแอนิเมชันเปิดหน้าต่างแบบนุ่มนวล)
+   ========================================================================== */
+
+/* --- 1. สำหรับ Central Modal (กล่องเด้งตรงกลางหน้าจอ) --- */
+.central-modal {
+    /* สไตล์เดิมของคุณที่มีอยู่แล้ว */
+    width: 100%;
+    max-width: 500px;
+    max-height: 85vh;
+    overflow-y: auto;
+    position: relative;
+    padding: 25px;
+    background: #ffffff !important; 
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); 
+    box-sizing: border-box;
+    color: #2c3e50 !important; 
+
+    /* 🆕 เพิ่มเติม: ตั้งค่าเริ่มต้นให้อยู่ในสถานะย่อตัวและจาง */
+    opacity: 0;
+    transform: scale(0.92) translateY(10px);
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+}
+
+/* เมื่อ Overlay มี class .active ให้เนื้อหากล่องตรงกลางผุดขึ้นมาอย่างนุ่มนวล */
+.modal-overlay.active .central-modal {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+}
+
+
+/* --- 2. สำหรับ Drawer Modal (เมนูด้านข้างที่สไลด์ออกมา) --- */
+.drawer-modal {
+    /* สไตล์เดิมของคุณที่มีอยู่แล้ว */
+    width: 300px;
+    height: 100vh;
+    position: fixed;
+    left: 0; top: 0;
+    border-radius: 0 24px 24px 0;
+    padding: 25px;
+    background: rgba(255, 255, 255, 0.85);
+    box-shadow: 5px 0 25px rgba(163, 177, 198, 0.2);
+
+    /* 🆕 เพิ่มเติม: ตั้งค่าเริ่มต้นให้ซ่อนตัวอยู่ฝั่งซ้ายนอกจอ */
+    transform: translateX(-100%);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* เมื่อ Overlay มี class .active ให้ Drawer สไลด์เข้ามานุ่มๆ */
+.modal-overlay.active .drawer-modal {
+    transform: translateX(0);
+}
+
+
+/* --- 3. สำหรับ Lightbox Overlay (เวลาเปิดดูรูปภาพใหญ่) --- */
+.lightbox-overlay {
+    /* 🆕 เพิ่มเอฟเฟกต์การ Fade ให้ตระกูล Lightbox ดูสมูทขึ้น */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+.lightbox-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+.lightbox-overlay .lightbox-container img {
+    transform: scale(0.95);
+    transition: transform 0.35s cubic-bezier(0.215, 0.610, 0.355, 1);
+}
+.lightbox-overlay.active .lightbox-container img {
+    transform: scale(1);
 }
