@@ -2,226 +2,409 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gaming Gear Affiliate - iPhone Liquid Glass Style</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Click&Co</title>
+    <link rel="icon" type="image/png" href="https://i.postimg.cc/506FpF6s/2.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="bg-glow-1"></div>
-    <div class="bg-glow-2"></div>
-
-    <nav class="navbar glass-card">
-        <div class="menu-toggle" id="menuToggle">
-            <i class="fas fa-bars"></i>
-        </div>
-        <div class="logo">GAMING GEAR</div>
-        <div class="admin-status" id="adminStatusText"></div>
-    </nav>
-
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-close" id="sidebarClose"><i class="fas fa-times"></i></div>
-        <div class="sidebar-content">
-            <h3>เมนูใช้งาน</h3>
-            <button class="btn-sidebar" id="btnAdminMenu"><i class="fas fa-user-shield"></i> เข้าสู่ระบบผู้ดูแล</button>
-            
-            <div id="adminShortcuts" class="hidden">
-                <hr>
-                <h4>เมนูผู้ดูแล</h4>
-                <a href="#admin-hero-section" class="sidebar-link">จัดการ Hero Banner</a>
-                <a href="#admin-product-section" class="sidebar-link">จัดการสินค้า</a>
-                <a href="#admin-category-section" class="sidebar-link">จัดการหมวดหมู่</a>
-                <button class="btn-logout" id="btnLogout">ออกจากระบบ</button>
+    <div class="app-container">
+        
+        <header class="main-header">
+            <button class="menu-toggle-btn" id="menuToggleBtn">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <div class="brand-logo">
+                <a href="index.html" style="display: inline-block; height: 100%;">
+                    <img src="https://i.postimg.cc/kJFN5xmr/1.png" alt="Click&Co" style="height: 40px; width: auto; object-fit: contain; vertical-align: middle;">
+                </a>
             </div>
-        </div>
-    </div>
-
-    <div class="modal" id="loginModal">
-        <div class="modal-content glass-card">
-            <h3>เข้าสู่ระบบผู้ดูแล</h3>
-            <div class="input-group">
-                <label>Username</label>
-                <input type="text" id="adminUser" placeholder="ระบุชื่อผู้ใช้">
-            </div>
-            <div class="input-group">
-                <label>Password</label>
-                <input type="password" id="adminPass" placeholder="ระบุรหัสผ่าน">
-            </div>
-            <p class="error-msg" id="loginError">รหัสผ่านไม่ถูกต้อง</p>
-            <p class="hint">* กด Enter เพื่อยืนยันการเข้าสู่ระบบ</p>
-            <button class="btn-close-modal" id="btnCloseLogin">ยกเลิก</button>
-        </div>
-    </div>
-
-    <div class="container">
-
-        <header class="hero-section glass-card">
-            <div class="slider-container" id="heroSlider">
-                </div>
-            <button class="slider-btn prev" id="slidePrev"><i class="fas fa-chevron-left"></i></button>
-            <button class="slider-btn next" id="slideNext"><i class="fas fa-chevron-right"></i></button>
-            
-            <div class="hero-action-zone">
-                <button id="heroActionBtn" class="btn-hero-action">เก็บโค้ดส่วนลด</button>
-            </div>
+            <div class="header-space"></div>
         </header>
 
-        <div class="search-filter-container">
-            <div class="search-box glass-card">
-                <input type="text" id="searchBar" placeholder="ค้นหาสินค้า คีย์เวิร์ด...">
-                <i class="fas fa-search search-icon"></i>
-            </div>
-            <div class="sort-box glass-card">
-                <select id="sortSelect">
-                    <option value="latest">สินค้าล่าสุด</option>
-                    <option value="price-asc">ราคาจากน้อยไปมาก</option>
-                    <option value="price-desc">ราคาจากมากไปน้อย</option>
-                </select>
-            </div>
-            <button id="clearFilterBtn" class="btn-clear hidden">ล้างการกรอง</button>
-        </div>
-
-        <div class="storefront">
-            <aside class="category-sidebar glass-card">
-                <h3>หมวดหมู่สินค้า</h3>
-                <div class="category-list" id="categoryNavList">
-                    </div>
+        <div class="main-layout">
+            
+            <aside class="sidebar" id="sidebarMenu">
+                <div class="sidebar-header">
+                    <h3>หมวดหมู่สินค้า</h3>
+                </div>
+                <ul class="category-list" id="categoryListContainer">
+                    </ul>
             </aside>
 
-            <main class="products-display">
-                <div class="products-grid" id="productsGrid">
+            <main class="content-area">
+                
+                <section class="control-section">
+                    <div class="search-wrapper">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input type="text" id="productSearchInput" placeholder="ค้นหาสินค้าเกมมิ่งเกียร์ที่นี่...">
                     </div>
+                    
+                    <div class="filter-wrapper">
+                        <select id="productSortSelect" class="glass-select">
+                            <option value="default">จัดเรียงสินค้า (เริ่มต้น)</option>
+                            <option value="price-desc">ราคา: มาก -> น้อย</option>
+                            <option value="price-asc">ราคา: น้อย -> มาก</option>
+                            <option value="latest">สินค้าล่าสุด</option>
+                        </select>
+                    </div>
+                </section>
+
+                <section class="products-section">
+                    <div class="products-grid" id="productsGridContainer">
+                        </div>
+
+                    <footer class="site-footer">
+                        <div class="footer-content">
+                            <p>&copy; 2026 <strong>Click&Co.</strong> All Rights Reserved.</p>
+                            <small>Gaming Gears & Accessories Store</small>
+                        </div>
+                    </footer>
+                </section>
+
             </main>
         </div>
-
-        <section id="adminPanel" class="admin-panel hidden">
-            <div class="admin-header glass-card">
-                <h2><i class="fas fa-sliders-h"></i> ระบบจัดการหลังบ้าน</h2>
-            </div>
-
-            <div id="admin-hero-section" class="admin-card glass-card">
-                <h3>(1) จัดการรูปภาพ Hero Banner (สูงสุด 5 ภาพ)</h3>
-                <div class="table-responsive">
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>สไลด์ที่</th>
-                                <th>URL รูปภาพ</th>
-                                <th>URL ลิงค์ปลายทาง</th>
-                                <th>การจัดการ</th>
-                            </tr>
-                        </thead>
-                        <tbody id="adminHeroTableBody"></tbody>
-                    </table>
-                </div>
-                <hr class="admin-hr">
-                <h4>แก้ไขปุ่มกิจกรรมบน Banner</h4>
-                <div class="form-row">
-                    <div class="input-group">
-                        <label>ชื่อปุ่ม</label>
-                        <input type="text" id="adminHeroBtnText">
-                    </div>
-                    <div class="input-group">
-                        <label>ลิงค์ URL ของปุ่ม</label>
-                        <input type="text" id="adminHeroBtnLink">
-                    </div>
-                </div>
-                <button class="btn-save" id="btnSaveHeroSettings">บันทึกข้อมูลสไลด์และปุ่ม</button>
-            </div>
-
-            <div id="admin-product-section" class="admin-card glass-card">
-                <h3 id="productFormTitle">(2) ระบบเพิ่มสินค้า</h3>
-                <form id="productForm">
-                    <input type="hidden" id="editProductId" value="">
-                    
-                    <div class="form-row">
-                        <div class="input-group">
-                            <label>ชื่อสินค้า</label>
-                            <input type="text" id="prodName" required>
-                        </div>
-                        <div class="input-group">
-                            <label>หมวดหมู่โครงสร้างลำดับ</label>
-                            <select id="prodCategorySelect" required></select>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="input-group">
-                            <label>รูปสินค้า (URL)</label>
-                            <input type="text" id="prodImg" required>
-                        </div>
-                        <div class="input-group">
-                            <label>ราคาปกติ (บาท)</label>
-                            <input type="number" id="prodPrice" required>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="input-group">
-                            <label>โค้ดส่วนลด (เช่น 25%=2500)</label>
-                            <input type="text" id="prodDiscountCode" placeholder="25%=2500">
-                        </div>
-                        <div class="input-group">
-                            <label>Keyword (คั่นด้วยเครื่องหมายจุลภาค `,` )</label>
-                            <input type="text" id="prodKeywords">
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="input-group">
-                            <label>ลิงค์ Shopee 1</label>
-                            <input type="text" id="linkShopee1" placeholder="https://shopee.co.th/...">
-                        </div>
-                        <div class="input-group">
-                            <label>ลิงค์ Shopee 2</label>
-                            <input type="text" id="linkShopee2" placeholder="เว้นว่างไว้หากมีลิงค์เดียว">
-                        </div>
-                        <div class="input-group">
-                            <label>ลิงค์ Lazada</label>
-                            <input type="text" id="linkLazada" placeholder="https://lazada.co.th/...">
-                        </div>
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="submit" class="btn-save" id="btnProductSubmit">เพิ่มสินค้า</button>
-                        <button type="button" class="btn-cancel hidden" id="btnProductCancel">ยกเลิกการแก้ไข</button>
-                    </div>
-                </form>
-            </div>
-
-            <div id="admin-category-section" class="admin-card glass-card">
-                <h3>(3) ระบบจัดการหมวดหมู่สินค้า</h3>
-                <div class="category-management-grid">
-                    <div class="category-form-box">
-                        <h4>เพิ่มหมวดหมู่ลำดับใหม่</h4>
-                        <p class="hint">โครงสร้าง: หมวดหมู่หลัก > ชนิดสินค้า > ยี่ห้อ</p>
-                        <div class="input-group">
-                            <label>หมวดหมู่หลัก (เช่น Gaming, PlayStation 5)</label>
-                            <input type="text" id="catMain" placeholder="Gaming">
-                        </div>
-                        <div class="input-group">
-                            <label>ชนิดสินค้าย่อย (เช่น เม้าส์, จอย)</label>
-                            <input type="text" id="catSub" placeholder="เม้าส์">
-                        </div>
-                        <div class="input-group">
-                            <label>ยี่ห้อ/แบรนด์ (เช่น Logitech, Razer)</label>
-                            <input type="text" id="catBrand" placeholder="Logitech">
-                        </div>
-                        <button class="btn-save" id="btnAddCategory">เพิ่มหมวดหมู่</button>
-                    </div>
-
-                    <div class="category-list-box">
-                        <h4>จัดเรียงหมวดหมู่และลบข้อมูล</h4>
-                        <div class="admin-cat-list" id="adminCatListContainer"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="admin-extension-section"></div>
-        </section>
     </div>
 
-    <script src="app.js"></script>
+    <div class="modal-overlay" id="sideMenuModal">
+        <div class="glass-modal drawer-modal">
+            <button class="close-modal-btn">&times;</button>
+            <div class="drawer-content">
+                <div class="user-status-box" id="adminStatusBox">
+                    <i class="fa-solid fa-circle-user"></i>
+                    <span id="statusText">โหมดผู้เยี่ยมชม</span>
+                </div>
+                <ul class="drawer-menu-links">
+                    <li><a href="#" id="loginMenuBtn"><i class="fa-solid fa-right-to-bracket"></i> เข้าสู่ระบบผู้ดูแล</a></li>
+                    <li class="admin-only"><a href="#" id="adminAddProductBtn"><i class="fa-solid fa-plus"></i> เพิ่มสินค้า</a></li>
+                    <li class="admin-only"><a href="#" id="adminManageCatBtn"><i class="fa-solid fa-folder-tree"></i> จัดการหมวดหมู่</a></li>
+                    <li class="admin-only"><a href="#" id="adminManageDiscountBtn"><i class="fa-solid fa-tags"></i> แก้ไขโค้ดส่วนลดทั้งหมด</a></li>
+                    <li class="admin-only"><a href="#" id="adminStatsBtn"><i class="fa-solid fa-chart-line"></i> ระบบสถิติ</a></li>
+                    <li class="admin-only"><a href="#" id="adminManageKeywordsBtn"><i class="fa-solid fa-gear"></i> จัดการ Keyword สินค้า</a></li>
+                    <li class="admin-only"><a href="#" id="adminLogoutBtn" class="logout-link"><i class="fa-solid fa-right-from-bracket"></i> ออกจากระบบ</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="loginModal">
+        <div class="glass-modal central-modal animate-popup">
+            <button class="close-modal-btn">&times;</button>
+            <h3>เข้าสู่ระบบผู้ดูแล</h3>
+            <form id="loginForm" class="modal-form">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="loginUser"  autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPass" >
+                </div>
+                <button type="submit" class="submit-btn">ยืนยันเข้าสู่ระบบ</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="subCatPopup">
+        <div class="glass-modal central-modal animate-popup">
+            <button class="close-modal-btn">&times;</button>
+            <h3 id="subCatTitle">เลือกหมวดหมู่ย่อย</h3>
+            
+            <div class="cat-section-title">หมวดหมู่ย่อย</div>
+            <div class="sub-cat-group" id="subCatGroupArea"></div>
+            
+            <div class="cat-section-divider"></div>
+            
+            <div class="cat-section-title">แบรนด์สินค้า</div>
+            <div class="brand-group" id="brandGroupArea"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="productDetailModal">
+    <div class="glass-modal central-modal detail-modal animate-popup">
+        <button class="close-modal-btn">&times;</button>
+        <div class="detail-grid">
+            <div class="detail-gallery">
+                <div class="main-preview-box">
+                    <img id="detailMainImg" src="" alt="Product Preview">
+                    <!-- ✨ แทรกบรรทัดนี้ลงไปตรงนี้ครับ -->
+                    <div class="main-preview-dots" id="detailMainImgDots"></div>
+                    </div>
+                    <div class="thumb-strip-wrapper">
+                        <div class="thumb-strip" id="detailThumbStrip"></div>
+                    </div>
+                </div>
+                <div class="detail-info">
+                    <h2 id="detailTitle">ชื่อสินค้า</h2>
+                    <div class="detail-price-box">
+                        <span class="price-num" id="detailPrice">0</span> <span class="currency">บาท</span>
+                    </div>
+                    <div class="detail-desc-box">
+                        <h4>รายละเอียดสินค้า</h4>
+                        <p id="detailDesc">รายละเอียด...</p>
+                    </div>
+                    <a href="#" id="detailOrderBtn" target="_blank" class="order-btn-big"><i class="fa-solid fa-cart-shopping"></i> สั่งซื้อสินค้า</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay lightbox-overlay" id="lightboxModal">
+        <button class="close-modal-btn lightbox-close">&times;</button>
+        <div class="lightbox-container">
+            <button class="lightbox-nav prev" id="lightboxPrev"><i class="fa-solid fa-chevron-left"></i></button>
+            <img id="lightboxImg" src="" alt="Zoomed">
+            <button class="lightbox-nav next" id="lightboxNext"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="productFormModal">
+        <div class="glass-modal central-modal form-modal animate-popup">
+            <button class="close-modal-btn">&times;</button>
+            <h3 id="productFormTitle">เพิ่มสินค้าใหม่</h3>
+            <form id="productForm" class="modal-form scrollable-form">
+                <input type="hidden" id="editProductId">
+                
+                <div class="form-group">
+                    <label>ชื่อสินค้า</label>
+                    <input type="text" id="formProdName" >
+                </div>
+                <div class="form-group checkbox-row">
+                    <label><input type="checkbox" id="formMall"> ร้าน MALL</label>
+                    <label><input type="checkbox" id="formComingSoon"> Coming Soon...</label>
+                    <label><input type="checkbox" id="formNew"> สินค้าใหม่ (NEW)</label>
+                    <label><input type="checkbox" id="formHot"> สินค้าขายดี (HOT)</label>
+                </div>
+                <div class="form-group">
+                    <label>รูปแสดงหน้าเว็บ (1 รูป URL)</label>
+                    <input type="url" id="formMainImg" >
+                </div>
+                
+                <div class="form-group url-gallery-group">
+                    <label>รูปสินค้าเพิ่มเติมใน Popup (สูงสุด 8 รูป URL)</label>
+                    <div id="formThumbUrlsContainer">
+                        </div>
+                    <small style="color:#666; display:block; margin-top:5px;">*ในโหมดผู้ดูแลหลังจากเซฟ สามารถลากสลับตำแหน่งภาพย่อยในหน้าดีเทลได้</small>
+                </div>
+
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label>ราคาปกติ (บาท)</label>
+                        <input type="number" id="formNormalPrice" >
+                    </div>
+                    <div class="form-group">
+                        <label>ส่วนลด (เช่น 25%=2000)</label>
+                        <input type="text" id="formDiscountCode" placeholder="25%=2000 หรือว่างไว้">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>รายละเอียดสินค้า</label>
+                    <textarea id="formProdDesc" rows="3" ></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Keywords (คั่นด้วยคอมมา , สำหรับการค้นหา)</label>
+                    <input type="text" id="formKeywords" placeholder="เช่น keyboard, magnetic, คีย์บอร์ด">
+                </div>
+
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label>หมวดหมู่หลัก</label>
+                        <select id="formMainCat" ></select>
+                    </div>
+                    <div class="form-group">
+                        <label>หมวดหมู่ย่อย</label>
+                        <select id="formSubCat" ></select>
+                    </div>
+                    <div class="form-group">
+                        <label>แบรนด์</label>
+                        <select id="formBrand" ></select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>ลิงก์ปุ่มสั่งซื้อสินค้า</label>
+                    <input type="url" id="formOrderLink" >
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" id="cancelEditBtn" class="cancel-btn hidden">ยกเลิกการแก้ไข</button>
+                    <button type="submit" class="submit-btn" id="saveProductBtn">บันทึกข้อมูลสินค้า</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="categoryManageModal">
+        <div class="glass-modal central-modal cat-manage-modal animate-popup">
+            <button class="close-modal-btn">&times;</button>
+            <h3>จัดการหมวดหมู่สินค้า</h3>
+            
+            <div class="add-cat-box">
+                <h4>เพิ่มหมวดหมู่ใหม่</h4>
+                <div class="form-row-3">
+                    <input type="text" id="newCatName" placeholder="ชื่อหมวดหมู่">
+                    <select id="newCatType">
+                        <option value="main">หมวดหมู่หลัก</option>
+                        <option value="sub">หมวดหมู่ย่อย</option>
+                        <option value="brand">แบรนด์สินค้า</option>
+                    </select>
+                    <button type="button" id="addNewCatBtn" class="submit-btn"><i class="fa-solid fa-plus"></i> เพิ่ม</button>
+                </div>
+            </div>
+
+            <div class="cat-drag-lists">
+                <div class="drag-column">
+                    <h5>หมวดหมู่หลัก (ลากเรียงได้)</h5>
+                    <ul class="drag-list" id="dragMainCatList"></ul>
+                </div>
+                <div class="drag-column">
+                    <h5>หมวดหมู่ย่อย (ลากเรียงได้)</h5>
+                    <ul class="drag-list" id="dragSubCatList"></ul>
+                </div>
+                <div class="drag-column">
+                    <h5>แบรนด์สินค้า (ลากเรียงได้)</h5>
+                    <ul class="drag-list" id="dragBrandList"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="bulkDiscountModal">
+        <div class="glass-modal central-modal bulk-modal animate-popup">
+            <button class="close-modal-btn">&times;</button>
+            <h3>แก้ไขโค้ดส่วนลด & ราคา ทั้งหมด</h3>
+            
+            <div class="bulk-filter-bar">
+                <button type="button" id="bulkSelectAllBtn" class="glass-btn">เลือกทั้งหมด</button>
+                <button type="button" id="bulkSelectMallBtn" class="glass-btn">เลือกเฉพาะสินค้า MALL</button>
+                <div class="bulk-action-inputs">
+                    <input type="text" id="bulkDiscountInput" placeholder="โค้ดส่วนลดใหม่ เช่น 20%=1000">
+                    <button type="button" id="applyBulkDiscountBtn" class="submit-btn">ปรับปรุงส่วนลดที่เลือก</button>
+                </div>
+            </div>
+
+            <div class="bulk-search-row">
+                <input type="text" id="bulkSearchSelector" placeholder="เลือกด่วนตามโค้ดส่วนลดเดิม เช่น 25%=2000">
+                <button type="button" id="selectByDiscountBtn" class="glass-btn">เลือกตามโค้ดนี้</button>
+            </div>
+
+            <div class="bulk-table-wrapper">
+                <table class="bulk-table">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" id="masterBulkCheck"></th>
+                            <th>สินค้า</th>
+                            <th width="150">ราคาปกติ (กด Enter เปลี่ยนทันที)</th>
+                            <th width="180">โค้ดส่วนลดปัจจุบัน</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bulkProductTableBody">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="statsModal" class="modal-overlay">
+        <div class="glass-modal central-modal animate-popup" style="max-width: 600px;">
+            <button class="close-modal-btn" onclick="closeModal('statsModal')">&times;</button>
+            
+            <h3 style="font-size: 1.4rem; margin-bottom: 20px; color: #2c3e50; font-weight: 600;">
+                <i class="fa-solid fa-chart-line" style="margin-right: 8px; color: #3498db;"></i>สถิติร้านค้า
+            </h3>
+            
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label style="font-weight: 500; color: #7f8c8d;">เลือกวันที่ต้องการตรวจสอบ :</label>
+                <input type="date" id="statDatePicker" style="width: 100%; max-width: 220px; margin-top: 5px;">
+            </div>
+
+            <div class="stats-summary-cards" style="margin-bottom: 20px;">
+                <div class="stat-card">
+                    <div style="font-size: 0.9rem; color: #7f8c8d;">ยอดเข้าชมระบบ</div>
+                    <div class="stat-num" id="statTotalViews">0</div>
+                    <div style="font-size: 0.8rem; color: #95a5a6;">ครั้ง</div>
+                </div>
+                <div class="stat-card">
+                    <div style="font-size: 0.9rem; color: #7f8c8d;">ยอดคลิกสั่งซื้อรวม</div>
+                    <div class="stat-num" id="statTotalClicks" style="color: #2ecc71;">0</div>
+                    <div style="font-size: 0.8rem; color: #95a5a6;">ครั้ง</div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <button id="clearViewsBtn" class="glass-btn" style="background: #e67e22; color: #fff; border: none; font-size: 0.85rem; padding: 10px 14px; border-radius: 10px; font-weight: 500;">
+                    <i class="fa-solid fa-eye-slash" style="margin-right: 5px;"></i> ล้างยอดเข้าชม
+                </button>
+                <button id="clearClicksBtn" class="glass-btn" style="background: #e74c3c; color: #fff; border: none; font-size: 0.85rem; padding: 10px 14px; border-radius: 10px; font-weight: 500;">
+                    <i class="fa-solid fa-trash-can" style="margin-right: 5px;"></i> ล้างยอดคลิกสั่งซื้อ
+                </button>
+            </div>
+
+            <div class="bulk-table-wrapper" style="margin-top: 15px; border-radius: 14px; max-height: 280px;">
+                <table class="bulk-table">
+                    <thead>
+                        <tr>
+                            <th style="background: #f8f9fa; color: #2c3e50; font-weight: 600;">ชื่อสินค้า</th>
+                            <th width="160" style="background: #f8f9fa; color: #2c3e50; font-weight: 600; text-align: center;">จำนวนคลิกสั่งซื้อ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="statsTableBody">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="modal-overlay" id="bulkKeywordModal">
+    <div class="glass-modal central-modal animate-popup" style="max-width: 900px; width: 95%; max-height: 85vh; display: flex; flex-direction: column; padding: 25px;">
+        <button class="close-modal-btn" style="position: absolute; top: 15px; right: 15px;">&times;</button>
+        
+        <h3 style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+            <i class="fa-solid fa-tags" style="color: var(--accent-color);"></i> จัดการ Keyword สินค้าแบบกลุ่ม
+        </h3>
+
+        <div style="background: rgba(0,0,0,0.02); padding: 15px; border-radius: 16px; margin-bottom: 15px; border: 1px solid var(--glass-border);">
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px;">
+                <div style="flex: 1; min-width: 200px;">
+                    <label style="font-size: 0.85rem; font-weight: 500; display: block; margin-bottom: 4px;">เลือกหมวดหมู่หลัก > ย่อย</label>
+                    <select id="bulkFilterCategorySelect" class="glass-select" style="width: 100%; padding: 8px 12px; font-size: 0.9rem;">
+                        </select>
+                </div>
+                <div style="flex: 1.5; min-width: 280px;">
+                    <label style="font-size: 0.85rem; font-weight: 500; display: block; margin-bottom: 4px;">แก้ไข Keyword พร้อมกัน (ชิ้นที่เลือก Checkbox)</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" id="bulkKeywordInput" placeholder="ตัวอย่าง: keyboard, magnetic, gaming" style="flex: 1; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--glass-border); background: var(--bg-app); outline: none; font-size: 0.9rem;">
+                        <button id="submitBulkKeywordBtn" style="background: var(--accent-color); color: #fff; border: none; padding: 8px 16px; border-radius: 10px; font-weight: 500; cursor: pointer; font-size: 0.9rem; white-space: nowrap;">
+                            <i class="fa-solid fa-floppy-disk"></i> อัปเดตกลุ่ม
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="flex: 1; overflow-y: auto; border-radius: 14px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.3);">
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+                <thead style="position: sticky; top: 0; background: var(--bg-app); z-index: 5; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                    <tr>
+                        <th width="50" style="padding: 12px; text-align: center;">
+                            <input type="checkbox" id="bulkSelectAllCheckbox" style="transform: scale(1.2); cursor: pointer;">
+                        </th>
+                        <th width="80" style="padding: 12px;">รูป</th>
+                        <th width="220" style="padding: 12px;">ชื่อสินค้า</th>
+                        <th width="180" style="padding: 12px;">หมวดหมู่</th>
+                        <th style="padding: 12px;">Keyword (พิมพ์แล้วกด Enter เพื่อเซฟรายชิ้น)</th>
+                    </tr>
+                </thead>
+                <tbody id="bulkKeywordTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="app.js"></script>
 </body>
 </html>
