@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaming Gear Affiliate - iPhone Liquid Glass Style</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="bg-glow-1"></div>
+    <div class="bg-glow-2"></div>
+
+    <nav class="navbar glass-card">
+        <div class="menu-toggle" id="menuToggle">
+            <i class="fas fa-bars"></i>
+        </div>
+        <div class="logo">GAMING GEAR</div>
+        <div class="admin-status" id="adminStatusText"></div>
+    </nav>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-close" id="sidebarClose"><i class="fas fa-times"></i></div>
+        <div class="sidebar-content">
+            <h3>เมนูใช้งาน</h3>
+            <button class="btn-sidebar" id="btnAdminMenu"><i class="fas fa-user-shield"></i> เข้าสู่ระบบผู้ดูแล</button>
+            
+            <div id="adminShortcuts" class="hidden">
+                <hr>
+                <h4>เมนูผู้ดูแล</h4>
+                <a href="#admin-hero-section" class="sidebar-link">จัดการ Hero Banner</a>
+                <a href="#admin-product-section" class="sidebar-link">จัดการสินค้า</a>
+                <a href="#admin-category-section" class="sidebar-link">จัดการหมวดหมู่</a>
+                <button class="btn-logout" id="btnLogout">ออกจากระบบ</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="loginModal">
+        <div class="modal-content glass-card">
+            <h3>เข้าสู่ระบบผู้ดูแล</h3>
+            <div class="input-group">
+                <label>Username</label>
+                <input type="text" id="adminUser" placeholder="ระบุชื่อผู้ใช้">
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="adminPass" placeholder="ระบุรหัสผ่าน">
+            </div>
+            <p class="error-msg" id="loginError">รหัสผ่านไม่ถูกต้อง</p>
+            <p class="hint">* กด Enter เพื่อยืนยันการเข้าสู่ระบบ</p>
+            <button class="btn-close-modal" id="btnCloseLogin">ยกเลิก</button>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <header class="hero-section glass-card">
+            <div class="slider-container" id="heroSlider">
+                </div>
+            <button class="slider-btn prev" id="slidePrev"><i class="fas fa-chevron-left"></i></button>
+            <button class="slider-btn next" id="slideNext"><i class="fas fa-chevron-right"></i></button>
+            
+            <div class="hero-action-zone">
+                <button id="heroActionBtn" class="btn-hero-action">เก็บโค้ดส่วนลด</button>
+            </div>
+        </header>
+
+        <div class="search-filter-container">
+            <div class="search-box glass-card">
+                <input type="text" id="searchBar" placeholder="ค้นหาสินค้า คีย์เวิร์ด...">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+            <div class="sort-box glass-card">
+                <select id="sortSelect">
+                    <option value="latest">สินค้าล่าสุด</option>
+                    <option value="price-asc">ราคาจากน้อยไปมาก</option>
+                    <option value="price-desc">ราคาจากมากไปน้อย</option>
+                </select>
+            </div>
+            <button id="clearFilterBtn" class="btn-clear hidden">ล้างการกรอง</button>
+        </div>
+
+        <div class="storefront">
+            <aside class="category-sidebar glass-card">
+                <h3>หมวดหมู่สินค้า</h3>
+                <div class="category-list" id="categoryNavList">
+                    </div>
+            </aside>
+
+            <main class="products-display">
+                <div class="products-grid" id="productsGrid">
+                    </div>
+            </main>
+        </div>
+
+        <section id="adminPanel" class="admin-panel hidden">
+            <div class="admin-header glass-card">
+                <h2><i class="fas fa-sliders-h"></i> ระบบจัดการหลังบ้าน</h2>
+            </div>
+
+            <div id="admin-hero-section" class="admin-card glass-card">
+                <h3>(1) จัดการรูปภาพ Hero Banner (สูงสุด 5 ภาพ)</h3>
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>สไลด์ที่</th>
+                                <th>URL รูปภาพ</th>
+                                <th>URL ลิงค์ปลายทาง</th>
+                                <th>การจัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminHeroTableBody"></tbody>
+                    </table>
+                </div>
+                <hr class="admin-hr">
+                <h4>แก้ไขปุ่มกิจกรรมบน Banner</h4>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>ชื่อปุ่ม</label>
+                        <input type="text" id="adminHeroBtnText">
+                    </div>
+                    <div class="input-group">
+                        <label>ลิงค์ URL ของปุ่ม</label>
+                        <input type="text" id="adminHeroBtnLink">
+                    </div>
+                </div>
+                <button class="btn-save" id="btnSaveHeroSettings">บันทึกข้อมูลสไลด์และปุ่ม</button>
+            </div>
+
+            <div id="admin-product-section" class="admin-card glass-card">
+                <h3 id="productFormTitle">(2) ระบบเพิ่มสินค้า</h3>
+                <form id="productForm">
+                    <input type="hidden" id="editProductId" value="">
+                    
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label>ชื่อสินค้า</label>
+                            <input type="text" id="prodName" required>
+                        </div>
+                        <div class="input-group">
+                            <label>หมวดหมู่โครงสร้างลำดับ</label>
+                            <select id="prodCategorySelect" required></select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label>รูปสินค้า (URL)</label>
+                            <input type="text" id="prodImg" required>
+                        </div>
+                        <div class="input-group">
+                            <label>ราคาปกติ (บาท)</label>
+                            <input type="number" id="prodPrice" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label>โค้ดส่วนลด (เช่น 25%=2500)</label>
+                            <input type="text" id="prodDiscountCode" placeholder="25%=2500">
+                        </div>
+                        <div class="input-group">
+                            <label>Keyword (คั่นด้วยเครื่องหมายจุลภาค `,` )</label>
+                            <input type="text" id="prodKeywords">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label>ลิงค์ Shopee 1</label>
+                            <input type="text" id="linkShopee1" placeholder="https://shopee.co.th/...">
+                        </div>
+                        <div class="input-group">
+                            <label>ลิงค์ Shopee 2</label>
+                            <input type="text" id="linkShopee2" placeholder="เว้นว่างไว้หากมีลิงค์เดียว">
+                        </div>
+                        <div class="input-group">
+                            <label>ลิงค์ Lazada</label>
+                            <input type="text" id="linkLazada" placeholder="https://lazada.co.th/...">
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-save" id="btnProductSubmit">เพิ่มสินค้า</button>
+                        <button type="button" class="btn-cancel hidden" id="btnProductCancel">ยกเลิกการแก้ไข</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="admin-category-section" class="admin-card glass-card">
+                <h3>(3) ระบบจัดการหมวดหมู่สินค้า</h3>
+                <div class="category-management-grid">
+                    <div class="category-form-box">
+                        <h4>เพิ่มหมวดหมู่ลำดับใหม่</h4>
+                        <p class="hint">โครงสร้าง: หมวดหมู่หลัก > ชนิดสินค้า > ยี่ห้อ</p>
+                        <div class="input-group">
+                            <label>หมวดหมู่หลัก (เช่น Gaming, PlayStation 5)</label>
+                            <input type="text" id="catMain" placeholder="Gaming">
+                        </div>
+                        <div class="input-group">
+                            <label>ชนิดสินค้าย่อย (เช่น เม้าส์, จอย)</label>
+                            <input type="text" id="catSub" placeholder="เม้าส์">
+                        </div>
+                        <div class="input-group">
+                            <label>ยี่ห้อ/แบรนด์ (เช่น Logitech, Razer)</label>
+                            <input type="text" id="catBrand" placeholder="Logitech">
+                        </div>
+                        <button class="btn-save" id="btnAddCategory">เพิ่มหมวดหมู่</button>
+                    </div>
+
+                    <div class="category-list-box">
+                        <h4>จัดเรียงหมวดหมู่และลบข้อมูล</h4>
+                        <div class="admin-cat-list" id="adminCatListContainer"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="admin-extension-section"></div>
+        </section>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

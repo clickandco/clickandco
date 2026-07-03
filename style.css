@@ -1,0 +1,401 @@
+/* SF Pro Inspired Typography & Light Core */
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&display=swap');
+
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Chakra Petch', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+    background-color: #eef2f7;
+    color: #1d1d1f;
+    overflow-x: hidden;
+    position: relative;
+    min-height: 100vh;
+}
+
+/* iPhone Premium Liquid Glass Canvas Effects (เพิ่มกลุ่มแสงและเลเยอร์พาสเทลเพื่อเร่งเอฟเฟกต์หักเหกระจก) */
+.bg-glow-1 {
+    position: fixed;
+    width: 650px;
+    height: 650px;
+    background: radial-gradient(circle, rgba(162, 232, 255, 0.6) 0%, rgba(255, 186, 225, 0.2) 50%, rgba(255, 255, 255, 0) 70%);
+    top: -150px;
+    left: -150px;
+    z-index: -1;
+    pointer-events: none;
+    filter: blur(40px);
+}
+
+.bg-glow-2 {
+    position: fixed;
+    width: 550px;
+    height: 550px;
+    background: radial-gradient(circle, rgba(210, 180, 255, 0.5) 0%, rgba(140, 210, 255, 0.3) 40%, rgba(255, 255, 255, 0) 70%);
+    bottom: -100px;
+    right: -50px;
+    z-index: -1;
+    pointer-events: none;
+    filter: blur(30px);
+}
+
+/* iPhone Liquid Glass Card Style (ปรับสัดส่วนความใส+เบลอเพิ่มมิติแก้ววิ่งผ่าน) */
+.glass-card {
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(25px) saturate(200%);
+    -webkit-backdrop-filter: blur(25px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 
+        0 4px 30px rgba(0, 0, 0, 0.03),
+        inset 0 1px 1px rgba(255, 255, 255, 0.8),
+        inset 0 -1px 2px rgba(0, 0, 0, 0.02);
+    border-radius: 24px;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card:hover {
+    background: rgba(255, 255, 255, 0.55);
+    border-color: rgba(255, 255, 255, 0.8);
+    transform: translateY(-2px);
+    box-shadow: 
+        0 12px 35px rgba(31, 38, 135, 0.06),
+        inset 0 1px 1px rgba(255, 255, 255, 0.9);
+}
+
+/* Navbar Style */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 28px;
+    margin: 20px auto;
+    width: 90%;
+    max-width: 1400px;
+    position: sticky;
+    top: 20px;
+    z-index: 100;
+}
+
+/* ปรับแก้ดีไซน์ปุ่ม Toggle และ Icon บนแถบเมนูเพื่อไม่ให้บัค */
+.menu-toggle {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    font-size: 16px;
+    cursor: pointer;
+    color: #0071e3;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+    transition: 0.25s;
+}
+
+.menu-toggle:hover {
+    transform: scale(1.05);
+    background: #0071e3;
+    color: #ffffff;
+}
+
+.logo {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #1d1d1f;
+    text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+}
+
+.admin-status {
+    font-size: 13px;
+    color: #34c759;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Sidebar Navigation */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -320px;
+    width: 320px;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(30px) saturate(180%);
+    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    border-right: 1px solid rgba(255, 255, 255, 0.5);
+    z-index: 1000;
+    transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 35px;
+    box-shadow: 20px 0 40px rgba(0,0,0,0.03);
+}
+
+.sidebar.active {
+    left: 0;
+}
+
+.sidebar-close {
+    text-align: right;
+    font-size: 22px;
+    cursor: pointer;
+    color: #ff3b30;
+    margin-bottom: 20px;
+}
+
+.sidebar-content h3 {
+    margin-bottom: 25px;
+    font-size: 19px;
+    color: #1d1d1f;
+    border-bottom: 2px solid #0071e3;
+    padding-bottom: 8px;
+}
+
+.btn-sidebar, .sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 14px;
+    color: #1d1d1f;
+    text-align: left;
+    margin-bottom: 12px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: 0.25s;
+    font-weight: 500;
+}
+
+.btn-sidebar:hover, .sidebar-link:hover {
+    background: rgba(0, 113, 233, 0.1);
+    color: #0071e3;
+    border-color: rgba(0, 113, 233, 0.3);
+}
+
+.btn-logout {
+    width: 100%;
+    padding: 12px;
+    background: #ff3b30;
+    color: white;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    margin-top: 25px;
+    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(255, 59, 48, 0.2);
+}
+
+/* Modal Popup Window */
+.modal {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 2000; opacity: 0; pointer-events: none;
+    transition: 0.3s ease;
+}
+
+.modal.active { opacity: 1; pointer-events: auto; }
+.modal-content { width: 90%; max-width: 400px; padding: 30px; }
+
+/* Container */
+.container {
+    width: 90%; max-width: 1400px; margin: 20px auto 50px auto;
+}
+
+/* iPhone Style Hero Slider Banner */
+.hero-section {
+    position: relative;
+    width: 100%; height: 400px;
+    overflow: hidden; margin-bottom: 30px;
+}
+
+.slider-container { width: 100%; height: 100%; position: relative; }
+.slide { position: absolute; top:0; left:0; width:100%; height:100%; opacity: 0; transition: opacity 0.6s ease-in-out; }
+.slide.active { opacity: 1; }
+.slide img { width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
+
+.slider-btn {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255,255,255,0.7); color: #1d1d1f; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 50%;
+    z-index: 10; transition: 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+}
+.slider-btn:hover { background: #0071e3; color: white; border-color: #0071e3; }
+.slider-btn.prev { left: 20px; }
+.slider-btn.next { right: 20px; }
+
+.hero-action-zone { position: absolute; bottom: 25px; left: 25px; z-index: 10; }
+.btn-hero-action {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+    color: #0071e3; font-weight: 600; border: 1px solid rgba(255,255,255,0.8);
+    padding: 12px 24px; border-radius: 14px; cursor: pointer;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04); transition: 0.3s;
+}
+.btn-hero-action:hover { transform: translateY(-2px); background: #ffffff; box-shadow: 0 8px 25px rgba(0, 113, 233, 0.15); }
+
+/* Search & Filtration Bar Elements */
+.search-filter-container {
+    display: flex; gap: 15px; margin-bottom: 30px; align-items: center; flex-wrap: wrap;
+}
+
+.search-box {
+    position: relative; width: 340px; max-width: 100%; display: flex; align-items: center;
+}
+
+.search-box input {
+    width: 100%; background: transparent; border: none; padding: 14px 45px 14px 20px;
+    color: #1d1d1f; outline: none; font-size: 15px; font-weight: 500;
+}
+
+.search-icon { position: absolute; right: 20px; color: #0071e3; font-size: 15px; }
+
+.sort-box select {
+    background: transparent; border: none; color: #1d1d1f; padding: 14px 20px;
+    outline: none; font-size: 15px; cursor: pointer; font-weight: 500; width: 100%;
+}
+.sort-box select option { background: #ffffff; color: #1d1d1f; }
+
+.btn-clear {
+    background: #8e8e93; color: white; border: none; padding: 12px 18px; border-radius: 12px; cursor: pointer; font-size: 14px; font-weight: 500;
+}
+
+/* Storefront */
+.storefront {
+    display: grid; grid-template-columns: 280px 1fr; gap: 30px;
+}
+@media (max-width: 920px) { .storefront { grid-template-columns: 1fr; } }
+
+/* Fix & Upgrade Custom Category Sidebar Popup Functionality */
+.category-sidebar { padding: 24px; height: fit-content; overflow: visible; position: relative; }
+.category-sidebar h3 { margin-bottom: 18px; font-size: 16px; color: #1d1d1f; font-weight: 600; border-bottom: 1px solid rgba(0,0,0,0.04); padding-bottom: 10px; }
+
+.category-item {
+    position: relative; padding: 12px 16px; margin-bottom: 8px;
+    background: rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.4); border-radius: 14px; cursor: pointer;
+    display: flex; justify-content: space-between; align-items: center;
+    transition: 0.25s; font-weight: 500;
+}
+.category-item:hover { background: rgba(0, 113, 233, 0.08); color: #0071e3; border-color: rgba(0,113,233,0.15); }
+
+/* Absolute position alignment popup fix constraints (ปรับพื้นผิว Pop-up ให้ใสน่าใช้ยิ่งขึ้น) */
+.category-popup {
+    display: none; 
+    position: absolute; 
+    left: 105%; 
+    top: 0;
+    width: 260px; 
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(25px) saturate(200%); 
+    -webkit-backdrop-filter: blur(25px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.7); 
+    border-radius: 20px;
+    padding: 20px; 
+    z-index: 999;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.8);
+}
+
+.category-item:hover .category-popup { display: block; }
+@media (max-width: 920px) { .category-popup { left: 0; top: 100%; width: 100%; } }
+
+.sub-cat-title { color: #8e8e93; font-weight: bold; font-size: 12px; margin: 8px 0 6px 0; border-bottom: 1px solid rgba(0,0,0,0.03); padding-bottom: 4px; text-transform: uppercase; }
+.brand-item-link { display: block; padding: 8px 12px; color: #3a3a3c; text-decoration: none; font-size: 14px; border-radius: 10px; transition: 0.2s; }
+.brand-item-link:hover { background: #0071e3; color: white !important; font-weight: 500; }
+
+/* Product Grid Display Elements */
+.products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+.product-card { position: relative; display: flex; flex-direction: column; overflow: hidden; padding: 20px; height: 100%; }
+
+/* ปรับปรุงกรอบรูปสินค้าให้ดูเป็นกระจกหลอมเหลวขัดเงา */
+.product-img-wrapper { 
+    width: 100%; 
+    height: 210px; 
+    border-radius: 16px; 
+    overflow: hidden; 
+    margin-bottom: 16px; 
+    background: rgba(255, 255, 255, 0.5); 
+    border: 1px solid rgba(255,255,255,0.6); 
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.01);
+}
+.product-img-wrapper img { width: 100%; height: 100%; object-fit: contain; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); cursor: pointer; }
+.product-card:hover .product-img-wrapper img { transform: scale(1.05); }
+
+/* Quick Action Icons */
+.admin-card-actions { position: absolute; top: 14px; right: 14px; display: flex; gap: 8px; z-index: 10; }
+.btn-card-edit, .btn-card-delete {
+    width: 36px; height: 36px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: 0.2s;
+}
+.btn-card-edit { background: #ff9500; }
+.btn-card-delete { background: #ff3b30; }
+.btn-card-edit:hover, .btn-card-delete:hover { transform: scale(1.1); }
+
+.product-info { flex-grow: 1; display: flex; flex-direction: column; }
+.product-name { font-size: 15px; font-weight: 600; line-height: 1.4; color: #1d1d1f; margin-bottom: 10px; height: 42px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; }
+
+.price-container { margin-bottom: 15px; }
+.original-price { font-size: 13px; color: #8e8e93; text-decoration: line-through; }
+.current-price { font-size: 20px; font-weight: 700; color: #ff2d55; } 
+
+/* Affiliate Button Actions Elements (ปรับแต่ง Icon ลิงค์ให้สมมาตร ไม่บัคเบี้ยว) */
+.affiliate-buttons { display: flex; flex-direction: column; gap: 8px; }
+.btn-aff {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 12px; border-radius: 14px; text-decoration: none; font-weight: 600; font-size: 14px; transition: 0.2s;
+}
+.btn-shopee { background: #ff5722; color: white; box-shadow: 0 4px 14px rgba(255, 87, 34, 0.15); }
+.btn-shopee:hover { background: #f44336; transform: translateY(-1px); }
+.btn-lazada { background: #0f143c; color: white; box-shadow: 0 4px 14px rgba(15, 20, 60, 0.15); }
+.btn-lazada:hover { background: #1a2260; transform: translateY(-1px); }
+
+/* Admin Panels Core Design Framework */
+.admin-panel { margin-top: 60px; padding-top: 40px; border-top: 1px solid rgba(0,0,0,0.05); }
+.admin-header { padding: 20px; margin-bottom: 30px; text-align: center; color: #0071e3; }
+.admin-card { padding: 25px; margin-bottom: 30px; }
+.admin-card h3 { color: #0071e3; margin-bottom: 20px; border-left: 4px solid #ff2d55; padding-left: 12px; font-size: 18px; }
+
+/* Admin Inputs */
+.form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin-bottom: 15px; }
+.input-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 15px; }
+.input-group label { font-size: 14px; color: #515154; font-weight: 500; }
+.input-group input, .input-group select { background: rgba(255,255,255,0.5); border: 1px solid rgba(0,0,0,0.08); padding: 12px; border-radius: 12px; color: #1d1d1f; outline: none; font-size: 14px; transition: 0.2s; }
+.input-group input:focus, .input-group select:focus { border-color: #0071e3; background: #ffffff; box-shadow: 0 0 0 4px rgba(0,113,233,0.1); }
+
+.form-actions { display: flex; gap: 12px; margin-top: 10px; }
+.btn-save { background: #34c759; color: white; font-weight: 600; border: none; padding: 12px 28px; border-radius: 12px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 12px rgba(52, 199, 89, 0.15); }
+.btn-save:hover { background: #28a745; }
+.btn-cancel { background: #8e8e93; color: white; border: none; padding: 12px 28px; border-radius: 12px; cursor: pointer; }
+
+/* Admin Grid Data Layout elements */
+.admin-table { width: 100%; border-collapse: collapse; text-align: left; margin-bottom: 20px; }
+.admin-table th, .admin-table td { padding: 14px; border-bottom: 1px solid rgba(0,0,0,0.04); font-size: 14px; }
+.admin-table th { font-weight: 600; color: #515154; }
+.admin-table input { width: 100%; background: rgba(255,255,255,0.6); border: 1px solid rgba(0,0,0,0.06); color: #1d1d1f; padding: 8px; border-radius: 8px; }
+
+.category-management-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+@media (max-width: 768px) { .category-management-grid { grid-template-columns: 1fr; } }
+
+.admin-cat-list { display: flex; flex-direction: column; gap: 10px; max-height: 350px; overflow-y: auto; padding-right: 5px; }
+.admin-cat-item { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.4); padding: 12px 18px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.04); }
+.cat-item-controls { display: flex; gap: 6px; }
+.btn-arrow { background: #ffffff; border: 1px solid rgba(0,0,0,0.05); color: #0071e3; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.btn-arrow:hover { background: #0071e3; color: white; }
+.btn-cat-del { background: rgba(255, 59, 48, 0.1); border: none; color: #ff3b30; padding: 0 12px; border-radius: 8px; cursor: pointer; font-weight: 500; }
+.btn-cat-del:hover { background: #ff3b30; color: white; }
+
+/* Custom System Auxiliary helpers */
+.error-msg { color: #ff3b30; font-size: 14px; display: none; margin: 12px 0; font-weight: 500; }
+.hint { color: #8e8e93; font-size: 12px; margin-top: 4px; }
+.admin-hr { border: none; border-top: 1px solid rgba(0,0,0,0.05); margin: 20px 0; }
+.hidden { display: none !important; }
+.dragging { opacity: 0.5; background: rgba(0,113,233,0.05) !important; border: 2px dashed #0071e3 !important; }
+.table-responsive { overflow-x: auto; width: 100%; }
