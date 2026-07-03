@@ -413,18 +413,25 @@ function renderProducts(customProductsList = null) {
    ========================================================================== */
 
 function openModal(id) {
-    document.getElementById(id).style.display = 'flex';
+    const modal = document.getElementById(id);
+    if (modal) modal.classList.add('active');
 }
 function closeModal(id) {
-    document.getElementById(id).style.display = 'none';
+    const modal = document.getElementById(id);
+    if (modal) modal.classList.remove('active');
 }
 
 document.querySelectorAll('.modal-overlay').forEach(overlay => {
     overlay.addEventListener('click', function(e) {
         if (e.target === this || e.target.classList.contains('close-modal-btn')) {
-            this.style.display = 'none';
+            this.classList.remove('active');
         }
     });
+});
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-overlay').forEach(o => o.classList.remove('active'));
+    }
 });
 window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
