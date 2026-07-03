@@ -414,12 +414,38 @@ function renderProducts(customProductsList = null) {
 
 function openModal(id) {
     const modal = document.getElementById(id);
-    if (modal) modal.classList.add('active');
+    if (modal) {
+        modal.classList.add('active');
+        
+        // เมื่อเปิดป๊อปอัป ให้ดัน State ใหม่เข้าไปในประวัติของ Browser เพื่อรองรับการกด Back
+        // ใส่ไอดีของโมดอลเข้าไปใน state เพื่อระบุว่าเปิดตัวไหนอยู่
+        history.pushState({ openModalId: id }, "");
+    }
 }
 function closeModal(id) {
     const modal = document.getElementById(id);
-    if (modal) modal.classList.remove('active');
+    if (modal) {
+        modal.classList.remove('active');
+        
+        // ถ้าปิดโมดอลด้วยการกดปุ่ม (X) หรือกดด้านนอก ให้เช็คว่าสเตทตรงกันไหม ถ้าตรงให้ถอยประวัติกลับ 1 สเต็ป
+        if (history.state && history.state.openModalId === id) {
+            history.back();
+        }
+    }
 }
+window.addEventListener('popstate', function(event) {
+    // ค้นหาป๊อปอัปที่มีคลาส active อยู่
+    const activeModals = document.querySelectorAll('.modal-overlay.active'); 
+    
+    if (activeModals.length > 0) {
+        activeModals.forEach(modal => {
+            modal.classList.remove('active'); // สั่งปิด
+        });
+    }
+});
+
+// และในฟังก์ชันเปิดป๊อปอัปตัวเดิมของคุณ ให้แอบหยอดบรรทัดนี้เพิ่มเข้าไป 1 บรรทัด:
+history.pushState({}, "");
 
 document.querySelectorAll('.modal-overlay').forEach(overlay => {
     overlay.addEventListener('click', function(e) {
@@ -1273,3 +1299,62 @@ window.applyBulkKeywords = async function() {
     
     alert(`อัปเดต Keyword ให้สินค้าทั้งหมด ${checkedBoxes.length} รายการเรียบร้อยแล้ว!`);
 };
+
+   /* ==========================================================================
+   SECTION 11: ระบบดักจับปุ่มย้อนกลับ: ปิดโมดอล หรือ ย้อนกลับมาที่เมนูทั้งหมด
+   ========================================================================== */
+
+/* ==========================================================================
+   ระบบควบคุมปุ่ม Back: ปิดป๊อปอัป -> กลับเมนูหลัก -> ออกจากเว็บ
+   ========================================================================== */
+
+// 1. ดักจับทุกครั้งที่มีการคลิกปุ่มเลือกเมนูย่อยบนหน้าเว็บ
+document.addEventListener('click', function(event) {
+    // ให้เปลี่ยนคำว่า '.menu-item' เป็น Class หรือ Tag ของปุ่มเมนูที่คุณใช้ (เช่น 'a', '.btn-category')
+    if (event.target.closest('.menu-item') || event.target.closest('a')) {
+        
+        // เมื่อมีการกดเลือกเมนู ให้สร้าง "จุดเช็กพอยท์" ไว้ในประวัติ Browser ทันที
+        if (!history.state || history.state.page !== 'submenu') {
+            history.pushState({ page: 'submenu' }, "");
+            console.log("บันทึก: เข้าสู่เมนูย่อยแล้ว");
+        }
+    }
+});
+
+// 2. ฟังก์ชันสั่งการเพื่อเปิดหน้า "เมนูทั้งหมด" 
+// (!!! ให้คุณแก้ไขโค้ดด้านในนี้ให้ตรงกับระบบแสดงผลของคุณ !!!)
+function forceShowAllMenu() {
+    // ตัวอย่างที่ 1: ถ้าใช้การสลับ Class (ยึดตามวิธีเปิด-ปิดยอดฮิต)
+    // const allMenu = document.getElementById('all-menu-section');
+    // const subMenu = document.getElementById('sub-menu-section');
+    // if(allMenu) allMenu.classList.add('active');
+    // if(subMenu) subMenu.classList.remove('active');
+
+    // ตัวอย่างที่ 2: ถ้าใช้ระบบซ่อนแสดงด้วย Display
+    // document.getElementById('main-menu').style.display = 'block';
+    // document.getElementById('sub-menu').style.display = 'none';
+    
+    console.log("กำลังดึงหน้าเมนูทั้งหมดกลับมาแสดงผล...");
+}
+
+// 3. ดักจับเมื่อผู้ใช้งานกดปุ่ม Back บนมือถือ
+window.addEventListener('popstate', function(event) {
+    
+    // [อันดับ 1] ถ้ามีป๊อปอัปเปิดอยู่ -> ให้ปิดป๊อปอัปก่อน
+    const activeModals = document.querySelectorAll('.modal-overlay.active');
+    if (activeModals.length > 0) {
+        activeModals.forEach(modal => modal.classList.remove('active'));
+        // ชดเชยสเตทกลับคืน เพื่อไม่ให้กระทบระบบเมนู
+        history.pushState(event.state, ""); 
+        return; 
+    }
+
+    // [อันดับ 2] ถ้าไม่มีป๊อปอัป แต่ตรวจเจอว่าถอยกลับมาจาก "เมนูย่อย"
+    // (ตรวจจากจุดเช็กพอยท์ page: 'submenu' ที่เราแอบฝังไว้ตอนกดเลือกเมนู)
+    if (!event.state || event.state.page !== 'submenu') {
+        
+        // สั่งให้หน้าเว็บดึง "เมนูทั้งหมด" กลับมาแสดง
+        forceShowAllMenu();
+        
+    }
+});

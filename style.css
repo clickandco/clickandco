@@ -242,6 +242,7 @@ body {
         scrollbar-color: rgba(163, 177, 198, 0.5) transparent;
         display: flex;
         flex-direction: column;
+        -webkit-overflow-scrolling: touch;
     }
     .products-grid {
         display: grid;
@@ -413,6 +414,39 @@ body {
     .order-btn { padding: 6px !important; font-size: 0.75rem !important; border-radius: 8px !important; }
     .admin-actions-trigger { transform: scale(0.8); top: 5px; right: 5px; }
 }
+@media (max-width: 768px) {
+    /* 🛠️ บังคับให้กล่องพรีวิวรูปภาพหดตามความกว้างป๊อปอัป */
+    .central-modal .main-preview-box {
+        width: 100% !important;
+        max-width: 100% !important;
+        aspect-ratio: 1 / 1 !important; /* บังคับให้เป็นสี่เหลี่ยมจัตุรัสพอดีจอ */
+        box-sizing: border-box !important;
+    }
+
+    /* 🛠️ บังคับให้ตัวรูปภาพด้านในไม่ล้นทะลักออกนอกกล่อง */
+    .central-modal .main-preview-box img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: contain !important; /* ให้เห็นรูปครบชิ้นและหดตามสัดส่วนจอ */
+    }
+
+    /* 🛠️ แก้ไขแถบรูปย่อ (Thumbnails) แนวนอน ไม่ให้ดึงขอบขวาพัง */
+    .central-modal .thumb-strip-wrapper {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: auto !important; /* เปิดให้ใช้นิ้วปัดซ้ายขวาเพื่อดูรูปย่ออื่น ๆ ได้ */
+        box-sizing: border-box !important;
+    }
+
+    /* 🛠️ บังคับข้อความรายละเอียดสินค้าให้ยอมตัดบรรทัด ไม่ดึงหน้าจอไปทางขวา */
+    .central-modal .product-title,
+    .central-modal .detail-desc-box,
+    .central-modal p,
+    .central-modal li {
+        white-space: normal !important;
+        word-break: break-word !important; /* ข้อความยาวแค่ไหนก็ต้องยอมขึ้นบรรทัดใหม่ */
+    }
+}
 
 /* ==========================================================================
    SECTION 4: COMMON WORKFLOWS (การ์ดสินค้า, แก้ไขเงาโมดอลให้นุ่มนวลสายตา)
@@ -534,18 +568,21 @@ body {
 
 .modal-overlay {
     position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
+    top: 0; 
+    left: 0; 
+    width: 100vw;
+    height: 100vh;
     background: rgba(0, 0, 0, 0.5); 
     z-index: 1000;
-    padding: 15px;
     backdrop-filter: blur(8px); 
     -webkit-backdrop-filter: blur(8px);
     
-    /* 🛠️ แก้ไขจุดนี้: เปลี่ยนจาก display: none เป็นซ่อนแบบโปร่งแสง เพื่อให้ทำ Animation ได้ */
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease;
-    display: flex; /* ใช้ flex จัดกึ่งกลางค้างไว้ได้เลย */
+    
+    /* บังคับใช้ flex จัดกึ่งกลางหน้าจอหลัก */
+    display: flex; 
     align-items: center;
     justify-content: center;
 }
@@ -555,28 +592,13 @@ body {
     opacity: 1;
     pointer-events: auto;
 }
-/* ค้นหาคลาสนี้ใน SECTION 4 แล้วแก้ให้เป็นแบบนี้ */
 .central-modal {
-    width: 100%;
-    max-width: 500px;
-    
-    /* 🛠️ แก้ไขจุดนี้: ล็อกความสูงให้พอดีจอมือถือ (หักลบ margin ซ้ายขวา/บนล่าง ออกฝั่งละ 15px รวมเป็น 30px) */
-    height: calc(100vh - 30px); 
-    max-height: calc(100vh - 30px);
-    
-    /* 🛠️ เพิ่มตรงนี้: จัดเรียงเนื้อหาภายในเป็นแนวตั้งเพื่อแยกโซน Scroll */
-    display: flex;
-    flex-direction: column;
-    overflow: hidden; /* ล็อกตัวกล่องหลักไม่ให้เกิด Scrollbar ซ้อน */
-    
-    position: relative;
-    padding: 25px;
-    background: #ffffff !important; 
-    border-radius: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); 
-    box-sizing: border-box;
-    color: #2c3e50 !important; 
+    width: 90vw !important; /* ใช้ความกว้างอิงตามหน้าจอมือถือจริง */
+    max-width: 450px;
+    margin: 0 auto !important;
+    box-sizing: border-box !important; /* ป้องกัน padding ดันกล่องพัง */
+    overflow-x: hidden !important; /* ตัดส่วนเกินแนวนอนทิ้งทั้งหมด */
+    overflow-y: auto !important;
 }
 .drawer-modal {
     width: 300px;
@@ -591,14 +613,16 @@ body {
 .close-modal-btn {
     position: absolute;
     top: 15px; right: 15px;
-    width: 32px; height: 32px;
+    width: 36px; height: 36px; /* ขยายขนาดกล่อง */
     border-radius: 50%;
-    border: none;
-    background: var(--bg-app);
-    box-shadow: 3px 3px 10px rgba(163, 177, 198, 0.3), -3px -3px 10px rgba(255, 255, 255, 0.9);
+    border: 2px solid var(--text-main); /* เพิ่มเส้นขอบสีเข้มตัดกับรูปพื้นหลัง */
+    background: #ffffff; /* ใช้สีขาวบริสุทธิ์เพื่อให้ตัดกับเส้นขอบ */
+    color: var(--text-main); /* ปรับสีกากบาทด้านในให้เข้มเด่นชัด */
+    font-weight: bold; /* เพิ่มความหนาให้ตัวกากบาท */
+    box-shadow: 0 4px 10px rgba(163, 177, 198, 0.4); 
     cursor: pointer;
-    font-size: 1.2rem;
-    line-height: 32px;
+    font-size: 1.3rem; /* เพิ่มขนาดกากบาท */
+    line-height: 32px; 
     text-align: center;
     z-index: 50;
 }
@@ -707,7 +731,16 @@ body {
 
 .detail-modal { max-width: 850px; }
 .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
-@media (max-width: 768px) { .detail-grid { grid-template-columns: 1fr; } }
+/* ค้นหาโค้ดนี้ใน SECTION 7 แล้วแก้ให้รองรับระบบ Flex/Block บนมือถือ */
+@media (max-width: 768px) { 
+    .detail-grid { 
+        display: flex !important;
+        flex-direction: column !important; /* บังคับให้รูปภาพอยู่บน ข้อความอยู่ล่าง */
+        gap: 15px !important; 
+        width: 100% !important;
+        box-sizing: border-box !important;
+    } 
+}
 .main-preview-box { width: 100%; aspect-ratio: 1; border-radius: 16px; background: white; overflow: hidden; box-shadow: var(--shadow-liquid-in); margin-bottom: 10px; cursor: pointer; }
 .main-preview-box img { width: 100%; height: 100%; object-fit: cover; }
 .thumb-strip-wrapper { overflow-x: auto; padding: 5px 0; }
@@ -872,15 +905,15 @@ body {
 .modal-overlay {
     opacity: 0;
     pointer-events: none;
-    background: rgba(15, 23, 42, 0); /* เปลี่ยนจากดำสนิทเป็นน้ำเงินเข้มลึกแบบแอปหรู */
+    background: rgba(15, 23, 42, 0);
     backdrop-filter: blur(0px); 
     -webkit-backdrop-filter: blur(0px);
-    /* ค่อยๆ ละลายฉากหลังด้วยความเร็วที่สอดคล้องกัน */
+    /* คุมจังหวะหน่วงเวลาให้ค่อยๆ เฟดออกอย่างสมดุล (0.4 วินาที) */
     transition: 
-        opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-        backdrop-filter 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-        -webkit-backdrop-filter 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-        background 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+        backdrop-filter 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+        -webkit-backdrop-filter 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+        background 0.4s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .modal-overlay.active {
@@ -891,20 +924,20 @@ body {
     -webkit-backdrop-filter: blur(12px);
 }
 
-/* กล่องป๊อปอัปตรงกลาง (เช่น ดูรูปสินค้า, หน้ากรอกข้อมูล) */
 .central-modal {
     opacity: 0;
-    /* เริ่มต้นจากย่อเล็กและเยื้องลงล่างนิดๆ */
-    transform: scale(0.94) translateY(24px);
-    /* ความเร็วดีเลย์สไตล์ iOS App - ปลายจะนุ่มมาก */
+    /* สถานะตอนปิด: หดย่อเหลือ 92% และย่นลงด้านล่าง 20px */
+    transform: scale(0.92) translateY(20px);
+    /* ล็อกสปีดทั้งขากลืนเข้าและขาปล่อยออกแบบลื่นไหลลวงตา (Ease-out Cubic-bezier) */
     transition: 
-        transform 0.42s cubic-bezier(0.16, 1, 0.3, 1), 
-        opacity 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+        transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1), 
+        opacity 0.3s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
+/* สถานะเมื่อเปิดใช้งาน (Active) */
 .modal-overlay.active .central-modal {
     opacity: 1;
-    transform: scale(1) translateY(0);
+    transform: scale(1) translateY(0) !important; 
 }
 
 /* เมนูด้านข้าง (Side Drawer) */
