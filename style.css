@@ -1,4 +1,39 @@
 /* ==========================================================================
+   GLOBAL APP-LIKE SMOOTHNESS PHYSICS
+   ========================================================================== */
+html {
+    scroll-behavior: smooth;
+    /* ลดแรงต้านการ Scroll บน iOS/Mobile ให้หน่วงนุ่มนวลขึ้น */
+    -webkit-overflow-scrolling: touch;
+}
+
+body {
+    /* ปรับ Rendering ตัวอักษรให้คมชัด ไม่กระตุกเวลาทำ Animation */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    /* ป้องกันการเผลอไฮไลท์ข้อความเวลาเบิ้ลคลิกปุ่มบนมือถือ เหมือนฟีเจอร์ใน App */
+    user-select: none;
+    -webkit-user-select: none;
+    overflow-x: hidden;
+}
+
+/* ปรับความนุ่มนวลให้กับ Scrollbar (แถบเลื่อน) ทั่วทั้งหน้าเว็บ */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(163, 177, 198, 0.4);
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(163, 177, 198, 0.6);
+}
+/* ==========================================================================
    SECTION 1: GLOBAL STYLES & VARIABLES (ปรับปรุงระบบเงาให้นุ่มนวล สบายตา)
    ========================================================================== */
 :root {
@@ -822,83 +857,104 @@ body {
     /* ลบ font-size หรือตัวเก่าที่ทำให้ตำแหน่งเพี้ยนออก (ถ้ามี) */
 }
 /* ==========================================================================
-   SECTION 12: ULTRA-SMOOTH POPUP & MODAL ANIMATIONS (ฉบับปรับปรุงความพรีเมียม)
+   SECTION 12: PRESTIGE POPUP & OVERLAYS INTERACTION
    ========================================================================== */
 
-/* --- 1. สำหรับพื้นหลังบดบัง (Modal Overlay) --- */
 .modal-overlay {
-    /* เพิ่ม Transition ให้เอฟเฟกต์กระจกเบลอ (Backdrop-filter) ค่อยๆ ละมุนขึ้น */
+    opacity: 0;
+    pointer-events: none;
+    background: rgba(15, 23, 42, 0); /* เปลี่ยนจากดำสนิทเป็นน้ำเงินเข้มลึกแบบแอปหรู */
     backdrop-filter: blur(0px); 
     -webkit-backdrop-filter: blur(0px);
-    background: rgba(0, 0, 0, 0); 
+    /* ค่อยๆ ละลายฉากหลังด้วยความเร็วที่สอดคล้องกัน */
     transition: 
-        opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1),
-        backdrop-filter 0.4s cubic-bezier(0.25, 1, 0.5, 1),
-        -webkit-backdrop-filter 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+        backdrop-filter 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+        -webkit-backdrop-filter 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+        background 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* เมื่อสั่งเปิดใช้งาน Overlay */
 .modal-overlay.active {
     opacity: 1;
-    background: rgba(0, 0, 0, 0.4); 
-    backdrop-filter: blur(8px); 
-    -webkit-backdrop-filter: blur(8px);
+    pointer-events: auto;
+    background: rgba(15, 23, 42, 0.35); /* พื้นหลังเนียนตา */
+    backdrop-filter: blur(12px); 
+    -webkit-backdrop-filter: blur(12px);
 }
 
-/* --- 2. สำหรับ Central Modal (กล่องเด้งตรงกลางหน้าจอ) --- */
+/* กล่องป๊อปอัปตรงกลาง (เช่น ดูรูปสินค้า, หน้ากรอกข้อมูล) */
 .central-modal {
-    /* ตั้งค่าเริ่มต้น: ใช้ scale และขยับลงล่างเล็กน้อย */
     opacity: 0;
-    transform: scale(0.95) translateY(20px);
-    
-    /* ใช้ค่า Cubic-Bezier แบบ Fluid Out (ค่อยๆ ผ่อนความเร็วตอนใกล้จบอย่างนุ่มนวลสูงสุด) */
+    /* เริ่มต้นจากย่อเล็กและเยื้องลงล่างนิดๆ */
+    transform: scale(0.94) translateY(24px);
+    /* ความเร็วดีเลย์สไตล์ iOS App - ปลายจะนุ่มมาก */
     transition: 
-        transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), 
-        opacity 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+        transform 0.42s cubic-bezier(0.16, 1, 0.3, 1), 
+        opacity 0.32s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* เมื่อเปิดใช้งาน: ให้ผุดขึ้นมาตรงกลางพอดี */
 .modal-overlay.active .central-modal {
     opacity: 1;
     transform: scale(1) translateY(0);
 }
 
-/* --- 3. สำหรับ Drawer Modal (เมนูด้านข้าง) --- */
+/* เมนูด้านข้าง (Side Drawer) */
 .drawer-modal {
     transform: translateX(-100%);
-    /* ใช้ค่าความเร็วสไลด์แบบดีเลย์นุ่มๆ เข้ากับขอบจอ */
-    transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    /* สไลด์เข้าออกแบบ Linear-to-Gentle Out */
+    transition: transform 0.42s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .modal-overlay.active .drawer-modal {
     transform: translateX(0);
 }
 
-/* --- 4. สำหรับ Lightbox Overlay (ดูรูปภาพใหญ่) --- */
-.lightbox-overlay {
-    opacity: 0;
-    pointer-events: none;
-    backdrop-filter: blur(0px);
-    -webkit-backdrop-filter: blur(0px);
-    background: rgba(0, 0, 0, 0);
+/* ==========================================================================
+   SECTION 13: APP-LIKE MICRO-INTERACTIONS (ปุ่ม และ ส่วนประกอบทั่วทั้งเว็บ)
+   ========================================================================== */
+
+/* 1. ทุกๆ ปุ่มกด ลิงก์ และไอคอน ให้เปลี่ยนสีและขยับตัวอย่างนุ่มนวล */
+button, .btn, a, .menu-toggle-btn, .close-modal-btn, i {
+    transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* 2. เอฟเฟกต์ปุ่มเวลากด (Active State) ให้มีการหดตัวเล็กน้อยเหมือนปุ่มบน iPhone */
+button:active, .btn:active, .menu-toggle-btn:active {
+    transform: scale(0.96) !important;
+    filter: brightness(0.93);
+}
+
+/* 3. กล่องสินค้า (Product Card) เวลาลอยตัว/เลื่อนผ่าน */
+.product-card {
     transition: 
-        opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1),
-        backdrop-filter 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), 
+        box-shadow 0.35s cubic-bezier(0.25, 0.8, 0.25, 1),
+        background-color 0.3s ease;
 }
 
-.lightbox-overlay.active {
-    opacity: 1;
-    pointer-events: auto;
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(163, 177, 198, 0.45);
 }
 
-.lightbox-overlay .lightbox-container img {
-    transform: scale(0.93);
-    transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+/* 4. ช่องพิมพ์ข้อความ (Input fields) เวลาคลิกโฟกัส */
+input[type="text"], input[type="password"], input[type="number"], select, textarea {
+    transition: 
+        border-color 0.25s cubic-bezier(0.25, 0.8, 0.25, 1),
+        box-shadow 0.25s cubic-bezier(0.25, 0.8, 0.25, 1),
+        background-color 0.25s ease;
 }
 
-.lightbox-overlay.active .lightbox-container img {
-    transform: scale(1);
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent-color) !important;
+    box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.15) !important; /* เงารอบๆ เด้งออกมาเนียนๆ */
+}
+
+/* 5. ตารางสินค้า (Table List) เวลาเอาเมาส์ไปชี้แถว */
+tbody tr {
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+tbody tr:hover {
+    background-color: rgba(244, 246, 249, 0.6) !important;
 }
