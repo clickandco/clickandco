@@ -62,9 +62,8 @@ body {
 body {
     background: var(--bg-app);
     color: var(--text-main);
-    overflow: hidden; 
-    height: 100vh; /* ❌ เปลี่ยนบรรทัดนี้ */
-    height: 100dvh; /* ใช้ dvh เพื่อล็อกขนาดให้พอดีกับพื้นที่เปิดจริงบนมือถือ */
+    overflow: hidden; /* ล็อกหน้าต่างหลักไม่ให้หลุด Scroll ทั้งหน้าจอ */
+    height: 100vh;
 }
 
 /* Base Utility Components */
@@ -256,29 +255,11 @@ body {
    SECTION 3: MOBILE STYLES (ปรับปรุงแบ่งฝั่ง: ซ้ายหมวดหมู่ / ขวาสินค้า)
    ========================================================================== */
 @media (max-width: 768px) {
-    /* ... โค้ดเดิมของคุณใน Section 3 ... */
-
-    /* ➕ เพิ่มโค้ดส่วนนี้ต่อท้ายใน Section 3 เพื่อคุมป๊อปอัปในมือถือ */
-    .modal-overlay {
-        padding: 10px; /* ลดระยะขอบนอก เพื่อให้ป๊อปอัปมีพื้นที่ขยายได้มากขึ้น */
-    }
-
-    .central-modal, .detail-modal {
-        width: 100% !important;
-        max-height: 80dvh !important; /* จำกัดความสูงไม่ให้ล้นทะลุ URL Bar ด้านบน/ล่าง */
-        padding: 15px !important;     /* ลด Padding ด้านในให้กระชับเข้ากับจอมือถือ */
-        border-radius: 16px !important;
-    }
-
-    /* ปรับขนาด Grid ในหน้าพรีวิวรายละเอียดให้เหลือ 1 คอลัมน์แนวดิ่ง */
-    .detail-grid {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 12px !important;
-    }
-
-    .main-preview-box {
-        margin-bottom: 5px !important;
+    .app-container {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
     }
 
     .main-header {
@@ -599,18 +580,28 @@ body {
     box-shadow: 5px 0 25px rgba(163, 177, 198, 0.2);
 }
 .close-modal-btn {
-    position: absolute;
-    top: 15px; right: 15px;
-    width: 32px; height: 32px;
+    position: fixed;            /* 1. เปลี่ยนเป็น fixed เพื่อล็อกตำแหน่งให้อยู่กับที่หน้าจอ ไม่เลื่อนตามเนื้อหา */
+    top: 30px;                  /* 2. ดันพิกัดให้อยู่นอกกล่อง Popup ขึ้นไปด้านบน */
+    right: 30px;                /* 3. ดันพิกัดออกไปทางขวา */
+    width: 42px;                /* ปรับขนาดกล่องปุ่มให้ใหญ่ขึ้นเล็กน้อยเพื่อให้กดง่าย */
+    height: 42px;
     border-radius: 50%;
     border: none;
-    background: var(--bg-app);
-    box-shadow: 3px 3px 10px rgba(163, 177, 198, 0.3), -3px -3px 10px rgba(255, 255, 255, 0.9);
+    background: #ffffff;        /* ใช้สีขาวทึบเพื่อไม่ให้กลมกลืนกับฉากหลังที่เบลอ */
+    color: #333333;             /* สีไอคอนกากบาท */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25); /* เพิ่มเงาเข้มขึ้นเพื่อให้ปุ่มลอยเด่นชัดเจนตลอดเวลา */
     cursor: pointer;
-    font-size: 1.2rem;
-    line-height: 32px;
+    font-size: 1.4rem;
+    line-height: 42px;
     text-align: center;
-    z-index: 50;
+    z-index: 2000;              /* 4. ตั้งค่า z-index สูงๆ (มากกว่า 1000) เพื่อให้อยู่เหนือชั้นของ Overlay เสมอ */
+}
+
+/* แถม: เพิ่ม Effect ตอนชี้เมาส์ (Hover) เพื่อให้ผู้ใช้รู้ว่ากดได้ และเปลี่ยนเป็นสีแดงตอนจะปิด */
+.close-modal-btn:hover {
+    transform: scale(1.1);
+    background: #fff0f0;
+    color: #e74c3c;
 }
 
 /* ==========================================================================
@@ -733,7 +724,7 @@ body {
 }
 .thumb-strip-wrapper::-webkit-scrollbar {
     display: none;
-}
+}   
 .thumb-img { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; background: white; cursor: pointer; border: 2px solid transparent; flex-shrink: 0; }
 .thumb-img.active { border-color: var(--accent-color); }
 .detail-price-box { font-size: 1.8rem; font-weight: bold; color: var(--text-main); margin: 15px 0; }
@@ -888,40 +879,67 @@ body {
     /* ลบ font-size หรือตัวเก่าที่ทำให้ตำแหน่งเพี้ยนออก (ถ้ามี) */
 }
 /* ==========================================================================
-   SECTION 12: PRESTIGE POPUP & OVERLAYS INTERACTION
+   SECTION 12: PRESTIGE POPUP & OVERLAYS INTERACTION (แก้ไขหลบแถบ URL มือถือ)
    ========================================================================== */
 
 .modal-overlay {
-    opacity: 0;
-    pointer-events: none;
-    background: rgba(15, 23, 42, 0); /* เปลี่ยนจากดำสนิทเป็นน้ำเงินเข้มลึกแบบแอปหรู */
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 1000;
+    background: rgba(15, 23, 42, 0); 
     backdrop-filter: blur(0px); 
     -webkit-backdrop-filter: blur(0px);
-    /* ค่อยๆ ละลายฉากหลังด้วยความเร็วที่สอดคล้องกัน */
+    display: flex; 
+    justify-content: center;
+    
+    /* 🚀 จัดให้อยู่ด้านบนกึ่งกลาง เพื่อใช้ padding-top ควบคุมระยะหลบ URL */
+    align-items: flex-start; 
+    padding-top: 80px; /* ดันป๊อปอัปเลื่อนลงมาจากขอบบน 80px หลบแถบ URL ชัวร์ๆ */
+    padding-bottom: 90px; /* เว้นระยะด้านล่างหลบแถบลิขสิทธิ์ตูดเว็บ */
+    overflow-y: auto; /* บนมือถือถ้าเนื้อหายาว ให้ scroll ที่ตัว overlay พื้นหลัง */
+    
     transition: 
         opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1),
         backdrop-filter 0.4s cubic-bezier(0.22, 1, 0.36, 1),
         -webkit-backdrop-filter 0.4s cubic-bezier(0.22, 1, 0.36, 1),
         background 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity: 0;
+    pointer-events: none;
 }
 
 .modal-overlay.active {
     opacity: 1;
     pointer-events: auto;
-    background: rgba(15, 23, 42, 0.35); /* พื้นหลังเนียนตา */
+    background: rgba(15, 23, 42, 0.35); 
     backdrop-filter: blur(12px); 
     -webkit-backdrop-filter: blur(12px);
 }
 
-/* กล่องป๊อปอัปตรงกลาง (เช่น ดูรูปสินค้า, หน้ากรอกข้อมูล) */
+/* 📦 ตัวกล่องป๊อปอัปขาว (ขนาดเริ่มต้นสำหรับมือถือ) */
 .central-modal {
+    position: relative !important;
+    width: 100%;
+    max-width: 500px; 
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 25px;
+    background: #ffffff !important; 
+    border-radius: 24px !important;
+    box-sizing: border-box;
+    color: #2c3e50 !important;
+    margin-bottom: 20px;
     opacity: 0;
-    /* เริ่มต้นจากย่อเล็กและเยื้องลงล่างนิดๆ */
     transform: scale(0.94) translateY(24px);
-    /* ความเร็วดีเลย์สไตล์ iOS App - ปลายจะนุ่มมาก */
     transition: 
         transform 0.42s cubic-bezier(0.16, 1, 0.3, 1), 
         opacity 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* 🚀 เพิ่มส่วนนี้: ปรับให้กล่องขยายกว้างขึ้นเมื่อเปิดบน PC */
+@media (min-width: 769px) {
+    .central-modal {
+        max-width: 850px; /* ขยายความกว้างบน PC ให้กว้างเต็มตา รองรับโครงสร้าง Grid ซ้าย-ขวา */
+    }
 }
 
 .modal-overlay.active .central-modal {
@@ -929,15 +947,49 @@ body {
     transform: scale(1) translateY(0);
 }
 
-/* เมนูด้านข้าง (Side Drawer) */
-.drawer-modal {
-    transform: translateX(-100%);
-    /* สไลด์เข้าออกแบบ Linear-to-Gentle Out */
-    transition: transform 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+/* ❌ ปุ่มกากบาทแปะติดมุมกล่องป๊อปอัป */
+.close-modal-btn {
+    position: absolute !important; /* เปลี่ยนจาก fixed มาเป็น absolute เพื่อเข้าสิงในกล่องป๊อปอัป */
+    top: 12px !important;          /* ระยะห่างจากขอบบนด้านในของกล่อง */
+    right: 12px !important;        /* ระยะห่างจากขอบขวาด้านในของกล่อง */
+    left: auto !important;
+    bottom: auto !important;
+    width: 34px !important;        /* ขนาดกะทัดรัดพอดีกับแนวโค้ง */
+    height: 34px !important;
+    border-radius: 50% !important;
+    border: none !important;
+    background: rgba(255, 255, 255, 0.85) !important; /* พื้นหลังสีขาวใสแนวหรู ซ้อนอยู่บนรูปภาพ */
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    color: #333333 !important;             
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important; /* เงาช่วยให้ลอยเด่นเหนือนมรูปภาพสินค้า */
+    cursor: pointer;
+    font-size: 1.1rem !important;
+    line-height: 34px !important;
+    text-align: center !important;
+    z-index: 9999 !important;      /* ดันให้อยู่เหนือชั้นของรูปภาพและเนื้อหาทั้งหมด */
 }
 
+.close-modal-btn:hover {
+    transform: scale(1.05);
+    background: #fff0f0 !important;
+    color: #e74c3c !important;
+}
+
+/* เมนูด้านข้าง (Side Drawer) ปล่อยไว้เหมือนเดิม */
+.drawer-modal {
+    transform: translateX(-100%);
+    transition: transform 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+}
 .modal-overlay.active .drawer-modal {
     transform: translateX(0);
+}
+
+/* ปรับระยะพิเศษเพิ่มเติมสำหรับมือถือ */
+@media (max-width: 768px) {
+    .modal-overlay {
+        padding-top: max(85px, calc(20px + env(safe-area-inset-top))) !important; /* คำนวณหลบแถบ URL และรอยบากของ iPhone/Android */
+    }
 }
 
 /* ==========================================================================

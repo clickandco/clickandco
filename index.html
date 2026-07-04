@@ -71,8 +71,7 @@
     </div>
 
     <div class="modal-overlay" id="sideMenuModal">
-        <div class="glass-modal drawer-modal">
-            <button class="close-modal-btn">&times;</button>
+        <button class="close-modal-btn">&times;</button> <div class="glass-modal drawer-modal">
             <div class="drawer-content">
                 <div class="user-status-box" id="adminStatusBox">
                     <i class="fa-solid fa-circle-user"></i>
@@ -92,8 +91,7 @@
     </div>
 
     <div class="modal-overlay" id="loginModal">
-        <div class="glass-modal central-modal animate-popup">
-            <button class="close-modal-btn">&times;</button>
+        <button class="close-modal-btn">&times;</button> <div class="glass-modal central-modal animate-popup">
             <h3>เข้าสู่ระบบผู้ดูแล</h3>
             <form id="loginForm" class="modal-form">
                 <div class="form-group">
@@ -110,8 +108,7 @@
     </div>
 
     <div class="modal-overlay" id="subCatPopup">
-        <div class="glass-modal central-modal animate-popup">
-            <button class="close-modal-btn">&times;</button>
+        <button class="close-modal-btn">&times;</button> <div class="glass-modal central-modal animate-popup">
             <h3 id="subCatTitle">เลือกหมวดหมู่ย่อย</h3>
             
             <div class="cat-section-title">หมวดหมู่ย่อย</div>
@@ -125,19 +122,18 @@
     </div>
 
     <div class="modal-overlay" id="productDetailModal">
-    <div class="glass-modal central-modal detail-modal animate-popup">
-        <button class="close-modal-btn">&times;</button>
-        <div class="detail-grid">
-            <div class="detail-gallery">
-                <div class="main-preview-box">
-                    <img id="detailMainImg" src="" alt="Product Preview">
-                    <!-- ✨ แทรกบรรทัดนี้ลงไปตรงนี้ครับ -->
-                    <div class="main-preview-dots" id="detailMainImgDots"></div>
-                    </div>
+        <button class="close-modal-btn">&times;</button> <div class="glass-modal central-modal detail-modal animate-popup">
+            <div class="detail-grid">
+                <div class="detail-gallery">
+                    <div class="main-preview-box">
+                        <img id="detailMainImg" src="" alt="Product Preview">
+                        <div class="main-preview-dots" id="detailMainImgDots"></div>
+                    </div> 
                     <div class="thumb-strip-wrapper">
                         <div class="thumb-strip" id="detailThumbStrip"></div>
                     </div>
                 </div>
+                
                 <div class="detail-info">
                     <h2 id="detailTitle">ชื่อสินค้า</h2>
                     <div class="detail-price-box">
@@ -147,7 +143,9 @@
                         <h4>รายละเอียดสินค้า</h4>
                         <p id="detailDesc">รายละเอียด...</p>
                     </div>
-                    <a href="#" id="detailOrderBtn" target="_blank" class="order-btn-big"><i class="fa-solid fa-cart-shopping"></i> สั่งซื้อสินค้า</a>
+                    <a href="#" id="detailOrderBtn" target="_blank" class="order-btn-big">
+                        <i class="fa-solid fa-cart-shopping"></i> สั่งซื้อสินค้า
+                    </a>
                 </div>
             </div>
         </div>
@@ -163,8 +161,7 @@
     </div>
 
     <div class="modal-overlay" id="productFormModal">
-        <div class="glass-modal central-modal form-modal animate-popup">
-            <button class="close-modal-btn">&times;</button>
+        <button class="close-modal-btn">&times;</button> <div class="glass-modal central-modal form-modal animate-popup">
             <h3 id="productFormTitle">เพิ่มสินค้าใหม่</h3>
             <form id="productForm" class="modal-form scrollable-form">
                 <input type="hidden" id="editProductId">
@@ -240,8 +237,7 @@
     </div>
 
     <div class="modal-overlay" id="categoryManageModal">
-        <div class="glass-modal central-modal cat-manage-modal animate-popup">
-            <button class="close-modal-btn">&times;</button>
+        <button class="close-modal-btn">&times;</button> <div class="glass-modal central-modal cat-manage-modal animate-popup">
             <h3>จัดการหมวดหมู่สินค้า</h3>
             
             <div class="add-cat-box">
@@ -275,8 +271,7 @@
     </div>
 
     <div class="modal-overlay" id="bulkDiscountModal">
-        <div class="glass-modal central-modal bulk-modal animate-popup">
-            <button class="close-modal-btn">&times;</button>
+        <button class="close-modal-btn">&times;</button> <div class="glass-modal central-modal bulk-modal animate-popup">
             <h3>แก้ไขโค้ดส่วนลด & ราคา ทั้งหมด</h3>
             
             <div class="bulk-filter-bar">
@@ -311,8 +306,7 @@
     </div>
 
     <div id="statsModal" class="modal-overlay">
-        <div class="glass-modal central-modal animate-popup" style="max-width: 600px;">
-            <button class="close-modal-btn" onclick="closeModal('statsModal')">&times;</button>
+        <button class="close-modal-btn" onclick="closeModal('statsModal')">&times;</button> <div class="glass-modal central-modal animate-popup" style="max-width: 600px;">
             
             <h3 style="font-size: 1.4rem; margin-bottom: 20px; color: #2c3e50; font-weight: 600;">
                 <i class="fa-solid fa-chart-line" style="margin-right: 8px; color: #3498db;"></i>สถิติร้านค้า
@@ -359,48 +353,48 @@
             </div>
         </div>
     </div>
-    <div class="modal-overlay" id="bulkKeywordModal">
-    <div class="glass-modal central-modal animate-popup" style="max-width: 900px; width: 95%; max-height: 85vh; display: flex; flex-direction: column; padding: 25px;">
-        <button class="close-modal-btn" style="position: absolute; top: 15px; right: 15px;">&times;</button>
-        
-        <h3 style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-            <i class="fa-solid fa-tags" style="color: var(--accent-color);"></i> จัดการ Keyword สินค้าแบบกลุ่ม
-        </h3>
 
-        <div style="background: rgba(0,0,0,0.02); padding: 15px; border-radius: 16px; margin-bottom: 15px; border: 1px solid var(--glass-border);">
-            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px;">
-                <div style="flex: 1; min-width: 200px;">
-                    <label style="font-size: 0.85rem; font-weight: 500; display: block; margin-bottom: 4px;">เลือกหมวดหมู่หลัก > ย่อย</label>
-                    <select id="bulkFilterCategorySelect" class="glass-select" style="width: 100%; padding: 8px 12px; font-size: 0.9rem;">
-                        </select>
-                </div>
-                <div style="flex: 1.5; min-width: 280px;">
-                    <label style="font-size: 0.85rem; font-weight: 500; display: block; margin-bottom: 4px;">แก้ไข Keyword พร้อมกัน (ชิ้นที่เลือก Checkbox)</label>
-                    <div style="display: flex; gap: 8px;">
-                        <input type="text" id="bulkKeywordInput" placeholder="ตัวอย่าง: keyboard, magnetic, gaming" style="flex: 1; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--glass-border); background: var(--bg-app); outline: none; font-size: 0.9rem;">
-                        <button id="submitBulkKeywordBtn" style="background: var(--accent-color); color: #fff; border: none; padding: 8px 16px; border-radius: 10px; font-weight: 500; cursor: pointer; font-size: 0.9rem; white-space: nowrap;">
-                            <i class="fa-solid fa-floppy-disk"></i> อัปเดตกลุ่ม
-                        </button>
+    <div class="modal-overlay" id="bulkKeywordModal">
+        <button class="close-modal-btn">&times;</button> <div class="glass-modal central-modal animate-popup" style="max-width: 900px; width: 95%; max-height: 85vh; display: flex; flex-direction: column; padding: 25px;">
+            
+            <h3 style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                <i class="fa-solid fa-tags" style="color: var(--accent-color);"></i> จัดการ Keyword สินค้าแบบกลุ่ม
+            </h3>
+
+            <div style="background: rgba(0,0,0,0.02); padding: 15px; border-radius: 16px; margin-bottom: 15px; border: 1px solid var(--glass-border);">
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <label style="font-size: 0.85rem; font-weight: 500; display: block; margin-bottom: 4px;">เลือกหมวดหมู่หลัก > ย่อย</label>
+                        <select id="bulkFilterCategorySelect" class="glass-select" style="width: 100%; padding: 8px 12px; font-size: 0.9rem;">
+                            </select>
+                    </div>
+                    <div style="flex: 1.5; min-width: 280px;">
+                        <label style="font-size: 0.85rem; font-weight: 500; display: block; margin-bottom: 4px;">แก้ไข Keyword พร้อมกัน (ชิ้นที่เลือก Checkbox)</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="text" id="bulkKeywordInput" placeholder="ตัวอย่าง: keyboard, magnetic, gaming" style="flex: 1; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--glass-border); background: var(--bg-app); outline: none; font-size: 0.9rem;">
+                            <button id="submitBulkKeywordBtn" style="background: var(--accent-color); color: #fff; border: none; padding: 8px 16px; border-radius: 10px; font-weight: 500; cursor: pointer; font-size: 0.9rem; white-space: nowrap;">
+                                <i class="fa-solid fa-floppy-disk"></i> อัปเดตกลุ่ม
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div style="flex: 1; overflow-y: auto; border-radius: 14px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.3);">
-            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
-                <thead style="position: sticky; top: 0; background: var(--bg-app); z-index: 5; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                    <tr>
-                        <th width="50" style="padding: 12px; text-align: center;">
-                            <input type="checkbox" id="bulkSelectAllCheckbox" style="transform: scale(1.2); cursor: pointer;">
-                        </th>
-                        <th width="80" style="padding: 12px;">รูป</th>
-                        <th width="220" style="padding: 12px;">ชื่อสินค้า</th>
-                        <th width="180" style="padding: 12px;">หมวดหมู่</th>
-                        <th style="padding: 12px;">Keyword (พิมพ์แล้วกด Enter เพื่อเซฟรายชิ้น)</th>
-                    </tr>
-                </thead>
-                <tbody id="bulkKeywordTableBody">
-                    </tbody>
+            <div style="flex: 1; overflow-y: auto; border-radius: 14px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.3);">
+                <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+                    <thead style="position: sticky; top: 0; background: var(--bg-app); z-index: 5; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                        <tr>
+                            <th width="50" style="padding: 12px; text-align: center;">
+                                <input type="checkbox" id="bulkSelectAllCheckbox" style="transform: scale(1.2); cursor: pointer;">
+                            </th>
+                            <th width="80" style="padding: 12px;">รูป</th>
+                            <th width="220" style="padding: 12px;">ชื่อสินค้า</th>
+                            <th width="180" style="padding: 12px;">หมวดหมู่</th>
+                            <th style="padding: 12px;">Keyword (พิมพ์แล้วกด Enter เพื่อเซฟรายชิ้น)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bulkKeywordTableBody">
+                        </tbody>
                 </table>
             </div>
         </div>

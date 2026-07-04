@@ -417,21 +417,29 @@ function openModal(id) {
     if (modal) {
         modal.classList.add('active');
         
-        // เมื่อเปิดป๊อปอัป ให้ดัน State ใหม่เข้าไปในประวัติของ Browser เพื่อรองรับการกด Back
-        // ใส่ไอดีของโมดอลเข้าไปใน state เพื่อระบุว่าเปิดตัวไหนอยู่
-        history.pushState({ openModalId: id }, "");
+        // ตรวจสอบว่าเคยใส่สถานะนี้ในประวัติเบราว์เซอร์หรือยัง ถ้ายังให้บันทึกไว้ว่ามี Popup เปิดอยู่
+        if (!history.state || history.state.popup !== true) {
+            history.pushState({ popup: true }, "");
+        }
     }
 }
+
 function closeModal(id) {
     const modal = document.getElementById(id);
     if (modal) {
         modal.classList.remove('active');
-        
-        // ถ้าปิดโมดอลด้วยการกดปุ่ม (X) หรือกดด้านนอก ให้เช็คว่าสเตทตรงกันไหม ถ้าตรงให้ถอยประวัติกลับ 1 สเต็ป
-        if (history.state && history.state.openModalId === id) {
-            history.back();
-        }
     }
+}
+
+// ฟังก์ชันเพิ่มเติมสำหรับสั่งปิดหน้าต่าง Popup ทุกตัวที่เปิดค้างไว้
+function closeAllModals() {
+    // ปิดหน้าต่างสินค้า
+    const productOverlay = document.getElementById('productModalOverlay');
+    if (productOverlay) productOverlay.classList.remove('active');
+
+    // ปิดหน้าต่าง Login ผู้ดูแลระบบด้วย เพื่อไม่ให้ pointer-events ค้างทับถมกัน
+    const adminOverlay = document.getElementById('adminModalOverlay');
+    if (adminOverlay) adminOverlay.classList.remove('active');
 }
 
 document.querySelectorAll('.modal-overlay').forEach(overlay => {
@@ -539,7 +547,7 @@ function openProductDetailPopup(id) {
         dot.className = `preview-dot ${index === 0 ? 'active' : ''}`;
         dot.setAttribute('data-index', index);
 
-        function updateActiveElements() {
+       function updateActiveElements() {
             document.querySelectorAll('.thumb-img').forEach(t => t.classList.remove('active'));
             img.classList.add('active');
             if (dotsContainer) {
@@ -548,6 +556,17 @@ function openProductDetailPopup(id) {
             }
             mainImgElement.src = url;
         }
+
+        // ✅ แก้ไข: ดักจับ Event และเพิ่ม stopPropagation เพื่อไม่ให้คลิกทะลุไปปิดหน้าต่าง
+        img.onclick = function(e) { 
+            if (e) e.stopPropagation(); 
+            updateActiveElements(); 
+        };
+        
+        dot.onclick = function(e) { 
+            if (e) e.stopPropagation(); 
+            updateActiveElements(); 
+        };
 
         img.onclick = function() { updateActiveElements(); };
         dot.onclick = function() { updateActiveElements(); };
@@ -592,6 +611,90 @@ function openProductDetailPopup(id) {
     };
 
     openModal('productDetailModal');
+    // 📱 [เพิ่มใหม่] ระบบปัดหน้าจอ (Swipe) สำหรับมือถือในหน้าต่างสินค้า
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    // ดักจับจุดที่เริ่มแตะนิ้วลงบนรูปภาพหลัก
+    mainImgElement.addEventListener('touchstart', function(e) {
+        touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    // ดักจับจุดที่ยกนิ้วขึ้นจากรูปภาพหลัก
+    mainImgElement.addEventListener('touchend', function(e) {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipeGesture();
+    }, { passive: true });
+
+    // ฟังก์ชันคำนวณทิศทางการปัดนิ้ว
+    function handleSwipeGesture() {
+        // หาตำแหน่งรูปปัจจุบันจากรูปย่อยที่ติดคลาส active อยู่
+        const activeThumb = thumbContainer.querySelector('.thumb-img.active');
+        if (!activeThumb) return;
+
+        let currentIndex = parseInt(activeThumb.getAttribute('data-index'));
+        let nextIndex = currentIndex;
+        
+        // คำนวณระยะทางที่ปัดนิ้ว (ต้องปัดมากกว่า 50px ถึงจะทำงาน เพื่อป้องกันมือลั่น)
+        const swipeThreshold = 50; 
+        
+        if (touchStartX - touchEndX > swipeThreshold) {
+            // 👈 ปัดนิ้วไปทางซ้าย = เลื่อนดูรูปถัดไป (ไปข้างหน้า)
+            nextIndex = (currentIndex + 1) % lightboxImagesArray.length;
+            triggerImageChange(nextIndex);
+        } 
+        else if (touchEndX - touchStartX > swipeThreshold) {
+            // 👉 ปัดนิ้วไปทางขวา = เลื่อนดูรูปก่อนหน้า (ย้อนกลับ)
+            nextIndex = (currentIndex - 1 + lightboxImagesArray.length) % lightboxImagesArray.length;
+            triggerImageChange(nextIndex);
+        }
+    }
+
+    // ฟังก์ชันสั่งจำลองการคลิกเปลี่ยนรูปภาพ
+    function triggerImageChange(index) {
+        const targetThumb = thumbContainer.querySelector(`.thumb-img[data-index="${index}"]`);
+        if (targetThumb) {
+            targetThumb.click(); // ลิงค์ไปหาฟังก์ชันเปลี่ยนรูปภาพเดิมอัตโนมัติ
+        }
+    }
+    // 🚀 เพิ่มฟังก์ชันดักจับปุ่มลูกศร ซ้าย-ขวา บนคีย์บอร์ดเพื่อเปลี่ยนรูปภาพ
+    const handleKeyDown = function(e) {
+        // เช็คก่อนว่าหน้าต่างรายละเอียดยังเปิดอยู่ไหม ถ้าถูกปิดไปแล้วให้ทำลาย Event ตัวเองทิ้ง
+        const modal = document.getElementById('productDetailModal');
+        if (!modal || !modal.classList.contains('active')) {
+            window.removeEventListener('keydown', handleKeyDown);
+            return;
+        }
+
+        // ดักจับปุ่ม ArrowLeft (ลูกศรซ้าย) และ ArrowRight (ลูกศรขวา)
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+            e.preventDefault(); // ป้องกันไม่ให้หน้าเว็บเลื่อนขึ้นลงเวลาสไลด์รูป
+            
+            // หาตำแหน่งรูปปัจจุบันจากรูปย่อยที่ติดคลาส active อยู่
+            const activeThumb = thumbContainer.querySelector('.thumb-img.active');
+            if (!activeThumb) return;
+            
+            let currentIndex = parseInt(activeThumb.getAttribute('data-index'));
+            let nextIndex = currentIndex;
+
+            if (e.key === 'ArrowLeft') {
+                // กดย้อนกลับ (ถ้ารูปแรกสุด ให้วนไปรูปสุดท้าย)
+                nextIndex = (currentIndex - 1 + lightboxImagesArray.length) % lightboxImagesArray.length;
+            } else if (e.key === 'ArrowRight') {
+                // กดไปข้างหน้า (ถ้ารูปสุดท้าย ให้วนกลับมารูปแรก)
+                nextIndex = (currentIndex + 1) % lightboxImagesArray.length;
+            }
+
+            // ค้นหา Element รูปย่อยตัวถัดไปแล้วสั่งจำลองการคลิก (Trigger Click) เพื่อเปลี่ยนรูป
+            const targetThumb = thumbContainer.querySelector(`.thumb-img[data-index="${nextIndex}"]`);
+            if (targetThumb) {
+                targetThumb.click();
+            }
+        }
+    };
+
+    // ลงทะเบียนฟังคำสั่งกดคีย์บอร์ดบนหน้าต่าง window
+    window.addEventListener('keydown', handleKeyDown);
 }
 
 document.getElementById('lightboxPrev').onclick = () => {
@@ -602,7 +705,66 @@ document.getElementById('lightboxNext').onclick = () => {
     currentLightboxIndex = (currentLightboxIndex + 1) % lightboxImagesArray.length;
     document.getElementById('lightboxImg').src = lightboxImagesArray[currentLightboxIndex];
 };
+// 🚀 เพิ่มระบบดักจับคีย์บอร์ด ปุ่มลูกศร ซ้าย-ขวา สำหรับโหมด "ขยายภาพ (Lightbox)"
+window.addEventListener('keydown', (e) => {
+    const lightboxModal = document.getElementById('lightboxModal');
+    
+    // เช็คก่อนว่าโหมดขยายภาพ (Lightbox) กำลังเปิดใช้งานอยู่จริง ๆ ไหม
+    if (lightboxModal && lightboxModal.classList.contains('active')) {
+        
+        if (e.key === 'ArrowLeft') {
+            e.preventDefault(); // ป้องกันหน้าเว็บเลื่อนแวบไปแวบมา
+            // เปลี่ยนรูปย้อนกลับ
+            currentLightboxIndex = (currentLightboxIndex - 1 + lightboxImagesArray.length) % lightboxImagesArray.length;
+            document.getElementById('lightboxImg').src = lightboxImagesArray[currentLightboxIndex];
+        } 
+        else if (e.key === 'ArrowRight') {
+            e.preventDefault();
+            // เปลี่ยนรูปไปข้างหน้า
+            currentLightboxIndex = (currentLightboxIndex + 1) % lightboxImagesArray.length;
+            document.getElementById('lightboxImg').src = lightboxImagesArray[currentLightboxIndex];
+        }
+    }
+});
 
+// 🚀 เพิ่มระบบปัดหน้าจอ (Swipe) สำหรับมือถือในโหมด "ขยายภาพเต็มจอ (Lightbox)"
+const lightboxImgElement = document.getElementById('lightboxImg');
+if (lightboxImgElement) {
+    let lbTouchStartX = 0;
+    let lbTouchEndX = 0;
+
+    // ดักจับจุดที่เริ่มแตะนิ้วลงบนรูปภาพขยายใหญ่
+    lightboxImgElement.addEventListener('touchstart', function(e) {
+        lbTouchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    // ดักจับจุดที่ยกนิ้วขึ้นจากรูปภาพขยายใหญ่
+    lightboxImgElement.addEventListener('touchend', function(e) {
+        lbTouchEndX = e.changedTouches[0].screenX;
+        handleLightboxSwipe();
+    }, { passive: true });
+
+    // ฟังก์ชันคำนวณทิศทางการปัดนิ้วในโหมดขยาย
+    function handleLightboxSwipe() {
+        const lightboxModal = document.getElementById('lightboxModal');
+        
+        // เช็คก่อนว่ากำลังเปิดหน้าต่างขยายภาพอยู่จริงหรือไม่
+        if (lightboxModal && lightboxModal.classList.contains('active')) {
+            const swipeThreshold = 50; // ระยะปัดนิ้วขั้นต่ำ (50px)
+
+            if (lbTouchStartX - lbTouchEndX > swipeThreshold) {
+                // 👈 ปัดนิ้วไปทางซ้าย = ไปข้างหน้า (จำลองการกดปุ่ม 'next')
+                currentLightboxIndex = (currentLightboxIndex + 1) % lightboxImagesArray.length;
+                document.getElementById('lightboxImg').src = lightboxImagesArray[currentLightboxIndex];
+            } 
+            else if (lbTouchEndX - lbTouchStartX > swipeThreshold) {
+                // 👉 ปัดนิ้วไปทางขวา = ย้อนกลับ (จำลองการกดปุ่ม 'prev')
+                currentLightboxIndex = (currentLightboxIndex - 1 + lightboxImagesArray.length) % lightboxImagesArray.length;
+                document.getElementById('lightboxImg').src = lightboxImagesArray[currentLightboxIndex];
+            }
+        }
+    }
+}
 /* ==========================================================================
    SECTION 5: ADMIN SYSTEM CONTROLLERS (ระบบผู้ดูแลความปลอดภัย)
    ========================================================================== */
@@ -1102,6 +1264,53 @@ if (adminLoggedIn) {
     document.body.classList.remove('admin-mode-active');
     document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
 }
+if (!history.state) {
+    history.replaceState({ page: "home", category: "ทั้งหมด" }, "");
+}
+
+// 2. ดักจับทุกครั้งเมื่อผู้ใช้งานกดปุ่ม "ย้อนกลับ" บนเบราว์เซอร์หรือโทรศัพท์มือถือ
+window.addEventListener('popstate', function(event) {
+    // เช็คว่ามีหน้าต่าง Popup ตัวใดตัวหนึ่งกำลังเปิดอยู่บนหน้าจอหรือไม่
+    const anyModalActive = document.querySelector('.modal-overlay.active');
+
+    if (anyModalActive) {
+        // [เคสที่ 1] ถ้ามี Popup เปิดอยู่ -> ให้ทำการปิด Popup ทั้งหมดทันที และไม่หลุดออกจากหน้าเว็บ
+        closeAllModals();
+        
+        // ดันสเตทประวัติกลับไว้ที่เดิม เผื่อผู้ใช้ต้องการกดย้อนกลับในเมนูคัดกรองต่อ
+        history.pushState({ page: "home", category: currentFilterCategory }, "");
+    } 
+    else if (currentFilterCategory !== "ทั้งหมด") {
+        // [เคสที่ 2] ไม่เปิด Popup แต่หน้าเว็บคัดกรองหมวดหมู่อื่นอยู่ -> ให้ย้อนกลับมาที่หมวดหมู่ "ทั้งหมด"
+        currentFilterCategory = "ทั้งหมด";
+        renderSidebar();
+        renderProducts();
+        
+        // อัปเดตสเตทปัจจุบันให้กลับมาเป็นหน้าแรกสุดสมบูรณ์
+        history.replaceState({ page: "home", category: "ทั้งหมด" }, "");
+    } 
+    // [เคสที่ 3] หากอยู่หน้าแรก (ทั้งหมด) และไม่มีหน้าต่างใด ๆ เปิดอยู่ การกดย้อนกลับอีกครั้งจะปิดเว็บ/ออกจากเว็บตามปกติของเบราว์เซอร์
+});
+
+// 3. ปรับปรุงฟังก์ชันเปลี่ยนหมวดหมู่สินค้าในแผงด้านข้าง เพื่อคอยเก็บประวัติไว้ว่าผู้ใช้เปลี่ยนไปเมนูไหน
+// (จะทำงานร่วมกับประวัติการย้อนกลับได้อย่างแม่นยำ)
+const originalRenderSidebar = renderSidebar;
+renderSidebar = function() {
+    originalRenderSidebar();
+    
+    // ดักจับ Event Click ของรายการเมนูย้อนหลังใหม่อีกครั้งเพื่อผูกสเตท
+    document.querySelectorAll('.category-item').forEach(item => {
+        item.addEventListener('click', function() {
+            let selectedCat = this.getAttribute('data-cat');
+            if (selectedCat === "ทั้งหมด") {
+                history.replaceState({ page: "home", category: "ทั้งหมด" }, "");
+            } else {
+                // หากเปลี่ยนไปหมวดหมู่อื่น ให้บันทึกสเตทเผื่อเวลากดย้อนกลับ
+                history.pushState({ page: "home", category: selectedCat }, "");
+            }
+        });
+    });
+};
 
 /* ==========================================================================
    SECTION 9: ระบบเคลียร์ข้อจำกัด URL อัตโนมัติ
