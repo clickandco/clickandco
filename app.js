@@ -1264,18 +1264,30 @@ if (adminLoggedIn) {
     document.body.classList.remove('admin-mode-active');
     document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
 }
+
 if (!history.state) {
     history.replaceState({ page: "home", category: "ทั้งหมด" }, "");
 }
 
+// 📱 ฟังก์ชันส่วนขยายเพิ่มเติมสำหรับปิด Bulk Keyword Modal
+function closeBulkKeywordModal() {
+    const bulkModal = document.getElementById('bulkKeywordModal');
+    if (bulkModal) {
+        bulkModal.classList.remove('active');
+    }
+}
+
 // 2. ดักจับทุกครั้งเมื่อผู้ใช้งานกดปุ่ม "ย้อนกลับ" บนเบราว์เซอร์หรือโทรศัพท์มือถือ
 window.addEventListener('popstate', function(event) {
-    // เช็คว่ามีหน้าต่าง Popup ตัวใดตัวหนึ่งกำลังเปิดอยู่บนหน้าจอหรือไม่
+    // เช็คว่ามีหน้าต่าง Popup ตัวใดตัวหนึ่ง หรือ Bulk Keyword Modal กำลังเปิดอยู่หรือไม่
     const anyModalActive = document.querySelector('.modal-overlay.active');
+    const bulkModal = document.getElementById('bulkKeywordModal');
+    const isBulkModalActive = bulkModal && bulkModal.classList.contains('active');
 
-    if (anyModalActive) {
-        // [เคสที่ 1] ถ้ามี Popup เปิดอยู่ -> ให้ทำการปิด Popup ทั้งหมดทันที และไม่หลุดออกจากหน้าเว็บ
+    if (anyModalActive || isBulkModalActive) {
+        // [เคสที่ 1] ถ้ามี Popup หรือ Bulk Keyword เปิดอยู่ -> ให้ทำการปิดทั้งหมดทันที
         closeAllModals();
+        closeBulkKeywordModal(); // 👈 เพิ่มให้ปิดหน้าต่างคีย์บอร์ดกลุ่มด้วย
         
         // ดันสเตทประวัติกลับไว้ที่เดิม เผื่อผู้ใช้ต้องการกดย้อนกลับในเมนูคัดกรองต่อ
         history.pushState({ page: "home", category: currentFilterCategory }, "");
@@ -1289,11 +1301,10 @@ window.addEventListener('popstate', function(event) {
         // อัปเดตสเตทปัจจุบันให้กลับมาเป็นหน้าแรกสุดสมบูรณ์
         history.replaceState({ page: "home", category: "ทั้งหมด" }, "");
     } 
-    // [เคสที่ 3] หากอยู่หน้าแรก (ทั้งหมด) และไม่มีหน้าต่างใด ๆ เปิดอยู่ การกดย้อนกลับอีกครั้งจะปิดเว็บ/ออกจากเว็บตามปกติของเบราว์เซอร์
+    // [เคสที่ 3] หากอยู่หน้าแรก (ทั้งหมด) และไม่มีหน้าต่างใด ๆ เปิดอยู่ การกดย้อนกลับอีกครั้งจะออกจากเว็บตามปกติ
 });
 
 // 3. ปรับปรุงฟังก์ชันเปลี่ยนหมวดหมู่สินค้าในแผงด้านข้าง เพื่อคอยเก็บประวัติไว้ว่าผู้ใช้เปลี่ยนไปเมนูไหน
-// (จะทำงานร่วมกับประวัติการย้อนกลับได้อย่างแม่นยำ)
 const originalRenderSidebar = renderSidebar;
 renderSidebar = function() {
     originalRenderSidebar();
