@@ -383,9 +383,20 @@ function renderProducts(customProductsList = null) {
             if (editBtn) {
                 editBtn.addEventListener('click', (e) => {
                     e.stopPropagation(); // ป้องกันไม่ให้ทะลุไปโดน Click Event ของแผ่น Card
+                    
+                    // 1. สร้าง Dropdown List ทั้งหมดก่อน
                     populateFormDropdowns();
+                    
+                    // 2. ดึง ID และข้อมูลทั่วไปมาใส่ในฟอร์ม
                     document.getElementById('editProductId').value = prod.id;
                     document.getElementById('formProdName').value = prod.name || "";
+                    
+                    // 🔥 [เพิ่มโค้ดตรงนี้] สั่งให้ Dropdown เลือกหมวดหมู่เดิมของสินค้าชิ้นนั้น ๆ
+                    document.getElementById('formMainCat').value = prod.mainCat || "";
+                    document.getElementById('formSubCat').value = prod.subCat || "";
+                    document.getElementById('formBrand').value = prod.brand || "";
+                    
+                    // 3. ข้อมูลอื่น ๆ ของฟอร์ม (เหมือนเดิม)
                     document.getElementById('formMainImg').value = prod.mainImg.includes("No+Image") ? "" : prod.mainImg;
                     document.getElementById('formNormalPrice').value = prod.price || "";
                     document.getElementById('formDiscountCode').value = prod.discountCode || "";
