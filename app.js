@@ -1148,6 +1148,12 @@ window.renameCategory = async function(key, idx) {
     let n = prompt("แก้ไขชื่อหมวดหมู่:", old);
     if (n && n.trim() !== "") {
         categories[key][idx] = n.trim();
+        
+        // 🌟 เพิ่มโค้ดบรรทัดนี้: ถ้าเป็นแบรนด์ให้เรียงลำดับใหม่หลังจากแก้ไขชื่อเสร็จ
+        if (key === 'brand') {
+            categories.brand.sort((a, b) => a.localeCompare(b, 'th'));
+        }
+        
         await setDoc(doc(db, "categories", key), { items: categories[key] });
         openCategoryManageModal(); renderSidebar();
     }
@@ -1165,8 +1171,16 @@ document.getElementById('addNewCatBtn').onclick = async () => {
     let name = document.getElementById('newCatName').value.trim();
     let type = document.getElementById('newCatType').value;
     if(!name) return alert('กรุณาใส่ชื่อหมวดหมู่');
+    
+    // เพิ่มข้อมูลเข้าไปในอาร์เรย์ตามปกติก่อน
     categories[type].push(name);
     
+    // 🌟 หากประเภทที่เพิ่มเข้ามาคือ 'brand' ให้สั่งเรียงลำดับจาก A-Z ทันที
+    if (type === 'brand') {
+        categories.brand.sort((a, b) => a.localeCompare(b, 'th'));
+    }
+    
+    // บันทึกขึ้นคลาวด์ด้วยข้อมูลที่เรียงลำดับใหม่แล้ว
     await setDoc(doc(db, "categories", type), { items: categories[type] });
     document.getElementById('newCatName').value = "";
     openCategoryManageModal();
