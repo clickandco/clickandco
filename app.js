@@ -433,13 +433,10 @@ function closeModal(id) {
 
 // ฟังก์ชันเพิ่มเติมสำหรับสั่งปิดหน้าต่าง Popup ทุกตัวที่เปิดค้างไว้
 function closeAllModals() {
-    // ปิดหน้าต่างสินค้า
-    const productOverlay = document.getElementById('productModalOverlay');
-    if (productOverlay) productOverlay.classList.remove('active');
-
-    // ปิดหน้าต่าง Login ผู้ดูแลระบบด้วย เพื่อไม่ให้ pointer-events ค้างทับถมกัน
-    const adminOverlay = document.getElementById('adminModalOverlay');
-    if (adminOverlay) adminOverlay.classList.remove('active');
+    // ดึงป๊อปอัปทุกตัวที่มีคลาส .modal-overlay หรือหน้าต่างคีย์บอร์ดกลุ่มมาปลดคลาส active ออกทั้งหมด
+    document.querySelectorAll('.modal-overlay, #bulkKeywordModal').forEach(modal => {
+        modal.classList.remove('active');
+    });
 }
 
 document.querySelectorAll('.modal-overlay').forEach(overlay => {
@@ -1291,38 +1288,26 @@ window.openBulkKeywordModal = function() {
 };
 
 // 📱 4. ระบบดักจับปุ่ม Back บนมือถือเพื่อปิดทุกๆ Popup แบบสมบูรณ์
+// 2. ดักจับทุกครั้งเมื่อผู้ใช้งานกดปุ่ม "ย้อนกลับ" หรือปัดขอบจอมือถือเพื่อย้อนกลับ
 window.addEventListener('popstate', function(event) {
-    // ตรวจสอบหา Popup มาตรฐาน (.modal-overlay) ที่ติดคลาส active อยู่ในหน้าจอ
-    const activeOverlay = document.querySelector('.modal-overlay.active');
-    
-    // ตรวจสอบหาหน้าต่างจัดการ Keyword กลุ่ม (#bulkKeywordModal)
-    const bulkModal = document.getElementById('bulkKeywordModal');
-    const isBulkActive = bulkModal && bulkModal.classList.contains('active');
+    // ตรวจสอบว่ามีหน้าต่าง Modal ใด ๆ กำลังถูกเปิดใช้งานอยู่บนหน้าจอหรือไม่ (เช็คจากคลาส active)
+    const activeModal = document.querySelector('.modal-overlay.active, #bulkKeywordModal.active');
 
-    // [เคสที่ 1] ถ้าพบว่ามีหน้าต่างใดๆ เปิดค้างอยู่บนหน้าจอ -> ให้ปิดหน้าต่างนั้นทันทีแทนการเปลี่ยนหน้าเว็บ
-    if (activeOverlay || isBulkActive) {
+    if (activeModal) {
+        // [เคสที่ 1] หากตรวจเจอว่ามีหน้าต่างเปิดอยู่ -> สั่งปิดหน้าต่างทั้งหมดทันทีแทนการย้อนกลับของเว็บ
+        closeAllModals();
         
-        // สั่งปิด Popup ปกติของแอปคุณ
-        if (typeof window.closeAllModals === 'function') {
-            window.closeAllModals();
-        }
-        
-        // สั่งเคลียร์และปิดหน้าต่างจัดการ Keyword กลุ่ม
-        if (bulkModal) {
-            bulkModal.classList.remove('active');
-        }
-        
-        // เซ็ตสถานะประวัติหน้าเว็บกลับสู่ปกติของหมวดหมู่สินค้าที่เลือกค้างไว้
-        history.replaceState({ page: "home", category: currentFilterCategory }, "");
+        // ดันประวัติ State หน้าปัจจุบันกลับไว้ที่เดิมเพื่อให้สามารถกด Back สเต็ปต่อไปได้ปกติ
+        history.pushState({ page: "home", category: currentFilterCategory }, "");
     } 
-    // [เคสที่ 2] หากไม่มีหน้าต่างใด ๆ เปิดอยู่ แต่ผู้ใช้เลือกหมวดหมู่อื่นอยู่ -> ให้กดย้อนกลับมาที่ "ทั้งหมด"
     else if (currentFilterCategory !== "ทั้งหมด") {
+        // [เคสที่ 2] ไม่มีหน้าต่างเปิดอยู่ แต่หน้าเว็บเลือกฟิลเตอร์หมวดหมู่อื่นอยู่ -> ย้อนกลับมาที่หมวดหมู่ "ทั้งหมด"
         currentFilterCategory = "ทั้งหมด";
         if (typeof renderSidebar === 'function') renderSidebar();
         if (typeof renderProducts === 'function') renderProducts();
         history.replaceState({ page: "home", category: "ทั้งหมด" }, "");
     }
-    // [เคสที่ 3] หากอยู่หน้าแรกปกติและไม่มีป๊อปอัปค้าง การกด Back อีกครั้งจะออกจากเว็บตามปกติของเบราว์เซอร์
+    // [เคสที่ 3] หากอยู่หน้าแรกปกติและไม่มีป๊อปอัป การกด Back อีกครั้งจะออกจากเว็บตามสไตล์ปกติของมือถือ
 });
 
 // 5. ปรับปรุงแถบเมนูด้านข้างเพื่อเก็บบันทึกประวัติสเตทเวลาเปลี่ยนประเภทสินค้า
