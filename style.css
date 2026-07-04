@@ -1324,3 +1324,108 @@ main .grid {
     /* ดันให้ชิ้นที่กำลัง Hover ลอยอยู่บนเลเยอร์สูงสุด ไม่โดนขอบ Search Bar หรือกล่องข้างๆ บัง */
     z-index: 99 !important;
 }
+
+/* ==========================================================================
+   SECTION 20: ULTRA-SMOOTH PRODUCT PREVIEW & LIGHTBOX ANIMATIONS (200ms)
+   ========================================================================== */
+
+/* 1. รูปภาพหลักและรูปใน Lightbox ตั้งค่าเริ่มต้นสำหรับการทำ Fade */
+#detailMainImg,
+#lightboxImg {
+    transition: opacity 0.2s cubic-bezier(0.25, 1, 0.5, 1),
+                transform 0.2s cubic-bezier(0.25, 1, 0.5, 1) !important;
+    will-change: opacity, transform;
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* คลาสที่จะถูกเรียกใช้ผ่าน JavaScript ตอนกำลังสลับรูปภาพ (จางลงและย่อเล็กน้อย) */
+.img-fade-out {
+    opacity: 0 !important;
+    transform: scale(0.97) !important;
+}
+
+/* 2. จัดการเรื่องปุ่มลูกศร ซ้าย-ขวา ให้แสดงผลถูกต้องและสมูท */
+#lightboxPrev,
+#lightboxNext {
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    width: 50px !important;
+    height: 50px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+    position: absolute !important;
+    top: 50% !important;
+    z-index: 9999 !important;
+}
+
+/* ซ่อมตำแหน่งปุ่มซ้าย-ขวา ไม่ให้ทับซ้อนหรือหาย */
+#lightboxPrev { 
+    left: 30px !important; 
+    transform: translateY(-50%) !important;
+}
+#lightboxNext { 
+    right: 30px !important; 
+    transform: translateY(-50%) !important;
+}
+
+/* เอฟเฟกต์ตอน Hover และกดปุ่ม */
+#lightboxPrev:hover,
+#lightboxNext:hover {
+    background: rgba(255, 255, 255, 0.25) !important;
+    border-color: rgba(255, 255, 255, 0.4);
+}
+#lightboxPrev:hover { transform: translateY(-50%) scale(1.1) !important; }
+#lightboxNext:hover { transform: translateY(-50%) scale(1.1) !important; }
+
+#lightboxPrev:active,
+#lightboxNext:active { transform: translateY(-50%) scale(0.95) !important; }
+
+
+/* 3. รูปพรีวิวเล็กด้านล่าง (Thumbnails) */
+.thumb-img {
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.thumb-img.active {
+    border-color: var(--primary-color, #3498db) !important;
+    transform: scale(1.05);
+}
+
+/* ==========================================================================
+   SECTION 21: FIXED PREVIEW CONTAINER & ASPECT RATIO (กรอบรูปพรีวิวเท่ากัน 100%)
+   ========================================================================== */
+
+/* 1. จัดการตัวหุ้มรูปภาพหลักในหน้า Pop-up ให้ล็อกความสูงไว้เสมอ ไม่ขยับตามรูป */
+.product-detail-images {
+    width: 100% !important;
+    aspect-ratio: 1 / 1 !important; /* บังคับให้กรอบเป็นสี่เหลี่ยมจัตุรัสสมบูรณ์ (1:1) */
+    max-height: 400px !important;    /* กำหนดความสูงสูงสุดที่ 400px */
+    background-color: #f0f2f5 !important; /* สีพื้นหลังแบบ Facebook คลีนๆ */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: hidden !important;     /* ตัดส่วนที่เกินขอบออก */
+    border-radius: 12px !important;
+    position: relative !important;
+}
+
+/* 2. บังคับรูปให้เต็มกรอบโดยอัตโนมัติ (ไม่ว่ารูปจะเล็กหรือใหญ่แค่ไหน) */
+#detailMainImg {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;    /* หัวใจสำคัญ: สั่งให้รูปขยายจนเต็มกรอบ 1:1 เสมอ */
+    object-position: center !important; /* จัดให้รูปอยู่กึ่งกลางเสมอ */
+    transition: transform 0.2s ease !important;
+}
+
+/* 3. จัดการรูปใน Lightbox ให้เท่ากันด้วย (เพื่อให้ไปทางเดียวกัน) */
+#lightboxImg {
+    width: 100% !important;
+    height: 80vh !important;
+    object-fit: contain !important; /* ใน Lightbox ใช้ contain เพื่อให้เห็นรูปครบทุกมุม */
+    background: transparent !important;
+}

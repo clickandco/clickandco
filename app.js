@@ -606,12 +606,13 @@ function openProductDetailPopup(id) {
         });
     }
 
-    // เมื่อคลิกที่รูปใหญ่เพื่อขยายโหมด Lightbox เต็มจอ
     mainImgElement.onclick = function() {
         lightboxImagesArray = localImagesArray; // ส่งค่าส่งต่อให้ Lightbox สไลด์ภาพได้ถูกต้อง
-        currentLightboxIndex = 0;
-        let activeThumb = thumbContainer.querySelector('.thumb-img.active');
-        if (activeThumb) currentLightboxIndex = parseInt(activeThumb.getAttribute('data-index'));
+        
+        // ค้นหาว่าตอนนี้รูปใหญ่ที่แสดงอยู่ ตรงกับอินเด็กซ์ไหนใน localImagesArray
+        const currentSrc = mainImgElement.getAttribute('src');
+        const foundIndex = localImagesArray.indexOf(currentSrc);
+        currentLightboxIndex = foundIndex !== -1 ? foundIndex : 0;
         
         document.getElementById('lightboxImg').src = lightboxImagesArray[currentLightboxIndex];
         openModal('lightboxModal');
@@ -658,11 +659,11 @@ function openProductDetailPopup(id) {
     }
 
     // 🚀 ระบบลูกศร ซ้าย-ขวา บนคีย์บอร์ดคอมพิวเตอร์ (ปรับปรุงให้รองรับโหมดขยายรูป Lightbox เต็มจอด้วย)
+    // 🚀 ระบบลูกศร ซ้าย-ขวา บนคีย์บอร์ดคอมพิวเตอร์
     const handleKeyDown = function(e) {
         const detailModal = document.getElementById('productDetailModal');
         const lightboxModal = document.getElementById('lightboxModal');
         
-        // ถ้ายกเลิกการเปิดหน้าต่างทั้งคู่ไปแล้ว ให้ถอด Event Listener ออกป้องกัน Memory Leak
         if ((!detailModal || !detailModal.classList.contains('active')) && 
             (!lightboxModal || !lightboxModal.classList.contains('active'))) {
             window.removeEventListener('keydown', handleKeyDown);
@@ -672,15 +673,15 @@ function openProductDetailPopup(id) {
         if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
             e.preventDefault();
 
-            // 🎯 เคสที่ 1: ถ้าเปิดหน้าต่างขยายรูปเต็มจอ (Lightbox) ตามในรูปของคุณอยู่
+            // เคสที่ 1: ถ้าเปิดหน้าต่างขยายรูปเต็มจอ (Lightbox) ให้คำนวณเลื่อนรูปในนี้โดยตรง
             if (lightboxModal && lightboxModal.classList.contains('active')) {
                 if (e.key === 'ArrowLeft') {
-                    document.getElementById('lightboxPrev').click(); // สั่งคลิกปุ่มซ้ายของ Lightbox
+                    document.getElementById('lightboxPrev').click();
                 } else if (e.key === 'ArrowRight') {
-                    document.getElementById('lightboxNext').click(); // สั่งคลิกปุ่มขวาของ Lightbox
+                    document.getElementById('lightboxNext').click();
                 }
             } 
-            // เคสที่ 2: ถ้าเปิดอยู่แค่หน้าต่างรายละเอียดธรรมดา (ไม่ได้ขยายรูปเต็มจอ)
+            // เคสที่ 2: ถ้าเปิดอยู่แค่หน้าต่างรายละเอียดปกติ ให้เลื่อนตามรูปเล็กด้านล่าง
             else if (detailModal && detailModal.classList.contains('active')) {
                 const activeThumb = thumbContainer.querySelector('.thumb-img.active');
                 if (!activeThumb) return;
@@ -706,12 +707,29 @@ function openProductDetailPopup(id) {
 }
 
 document.getElementById('lightboxPrev').onclick = () => {
+    if (lightboxImagesArray.length === 0) return;
     currentLightboxIndex = (currentLightboxIndex - 1 + lightboxImagesArray.length) % lightboxImagesArray.length;
     document.getElementById('lightboxImg').src = lightboxImagesArray[currentLightboxIndex];
+    
+    // ซิงค์รูปพรีวิวเล็กด้านหลังให้เปลี่ยนตามด้วย
+    const thumbContainer = document.getElementById('detailThumbStrip');
+    if (thumbContainer) {
+        const targetThumb = thumbContainer.querySelector(`.thumb-img[data-index="${currentLightboxIndex}"]`);
+        if (targetThumb) targetThumb.click();
+    }
 };
+
 document.getElementById('lightboxNext').onclick = () => {
+    if (lightboxImagesArray.length === 0) return;
     currentLightboxIndex = (currentLightboxIndex + 1) % lightboxImagesArray.length;
     document.getElementById('lightboxImg').src = lightboxImagesArray[currentLightboxIndex];
+    
+    // ซิงค์รูปพรีวิวเล็กด้านหลังให้เปลี่ยนตามด้วย
+    const thumbContainer = document.getElementById('detailThumbStrip');
+    if (thumbContainer) {
+        const targetThumb = thumbContainer.querySelector(`.thumb-img[data-index="${currentLightboxIndex}"]`);
+        if (targetThumb) targetThumb.click();
+    }
 };
 /* ==========================================================================
    SECTION 5: ADMIN SYSTEM CONTROLLERS (ระบบผู้ดูแลความปลอดภัย)
