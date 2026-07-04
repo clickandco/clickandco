@@ -657,31 +657,47 @@ function openProductDetailPopup(id) {
         }
     }
 
-    // 🚀 ระบบลูกศร ซ้าย-ขวา บนคีย์บอร์ดคอมพิวเตอร์
+    // 🚀 ระบบลูกศร ซ้าย-ขวา บนคีย์บอร์ดคอมพิวเตอร์ (ปรับปรุงให้รองรับโหมดขยายรูป Lightbox เต็มจอด้วย)
     const handleKeyDown = function(e) {
-        const modal = document.getElementById('productDetailModal');
-        if (!modal || !modal.classList.contains('active')) {
+        const detailModal = document.getElementById('productDetailModal');
+        const lightboxModal = document.getElementById('lightboxModal');
+        
+        // ถ้ายกเลิกการเปิดหน้าต่างทั้งคู่ไปแล้ว ให้ถอด Event Listener ออกป้องกัน Memory Leak
+        if ((!detailModal || !detailModal.classList.contains('active')) && 
+            (!lightboxModal || !lightboxModal.classList.contains('active'))) {
             window.removeEventListener('keydown', handleKeyDown);
             return;
         }
 
         if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
             e.preventDefault();
-            const activeThumb = thumbContainer.querySelector('.thumb-img.active');
-            if (!activeThumb) return;
-            
-            let currentIndex = parseInt(activeThumb.getAttribute('data-index'));
-            let nextIndex = currentIndex;
 
-            if (e.key === 'ArrowLeft') {
-                nextIndex = (currentIndex - 1 + localImagesArray.length) % localImagesArray.length;
-            } else if (e.key === 'ArrowRight') {
-                nextIndex = (currentIndex + 1) % localImagesArray.length;
-            }
+            // 🎯 เคสที่ 1: ถ้าเปิดหน้าต่างขยายรูปเต็มจอ (Lightbox) ตามในรูปของคุณอยู่
+            if (lightboxModal && lightboxModal.classList.contains('active')) {
+                if (e.key === 'ArrowLeft') {
+                    document.getElementById('lightboxPrev').click(); // สั่งคลิกปุ่มซ้ายของ Lightbox
+                } else if (e.key === 'ArrowRight') {
+                    document.getElementById('lightboxNext').click(); // สั่งคลิกปุ่มขวาของ Lightbox
+                }
+            } 
+            // เคสที่ 2: ถ้าเปิดอยู่แค่หน้าต่างรายละเอียดธรรมดา (ไม่ได้ขยายรูปเต็มจอ)
+            else if (detailModal && detailModal.classList.contains('active')) {
+                const activeThumb = thumbContainer.querySelector('.thumb-img.active');
+                if (!activeThumb) return;
+                
+                let currentIndex = parseInt(activeThumb.getAttribute('data-index'));
+                let nextIndex = currentIndex;
 
-            const targetThumb = thumbContainer.querySelector(`.thumb-img[data-index="${nextIndex}"]`);
-            if (targetThumb) {
-                targetThumb.click();
+                if (e.key === 'ArrowLeft') {
+                    nextIndex = (currentIndex - 1 + localImagesArray.length) % localImagesArray.length;
+                } else if (e.key === 'ArrowRight') {
+                    nextIndex = (currentIndex + 1) % localImagesArray.length;
+                }
+
+                const targetThumb = thumbContainer.querySelector(`.thumb-img[data-index="${nextIndex}"]`);
+                if (targetThumb) {
+                    targetThumb.click();
+                }
             }
         }
     };
