@@ -1399,33 +1399,31 @@ main .grid {
    SECTION 21: FIXED PREVIEW CONTAINER & ASPECT RATIO (กรอบรูปพรีวิวเท่ากัน 100%)
    ========================================================================== */
 
-/* 1. จัดการตัวหุ้มรูปภาพหลักในหน้า Pop-up ให้ล็อกความสูงไว้เสมอ ไม่ขยับตามรูป */
+.product-detail-modal, 
+#productDetailModal .modal-content {
+    max-width: 950px !important; /* ปรับจากค่าเดิมเป็น 950px หรือมากกว่าเพื่อความกว้าง */
+    width: 90% !important;       /* ให้ยืดหยุ่นตามหน้าจอ */
+    padding: 30px !important;
+}
+
+/* 2. ขยายกรอบรูปภาพหลักให้ใหญ่ขึ้นตามสัดส่วนใหม่ */
 .product-detail-images {
     width: 100% !important;
-    aspect-ratio: 1 / 1 !important; /* บังคับให้กรอบเป็นสี่เหลี่ยมจัตุรัสสมบูรณ์ (1:1) */
-    max-height: 400px !important;    /* กำหนดความสูงสูงสุดที่ 400px */
-    background-color: #f0f2f5 !important; /* สีพื้นหลังแบบ Facebook คลีนๆ */
+    max-height: 500px !important; /* ปรับจาก 400px เป็น 500px เพื่อให้รูปใหญ่ขึ้น */
+    aspect-ratio: 1 / 1 !important; 
+    border-radius: 12px !important;
+    background-color: #f0f2f5 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    overflow: hidden !important;     /* ตัดส่วนที่เกินขอบออก */
-    border-radius: 12px !important;
-    position: relative !important;
+    overflow: hidden !important;
 }
 
-/* 2. บังคับรูปให้เต็มกรอบโดยอัตโนมัติ (ไม่ว่ารูปจะเล็กหรือใหญ่แค่ไหน) */
-#detailMainImg {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;    /* หัวใจสำคัญ: สั่งให้รูปขยายจนเต็มกรอบ 1:1 เสมอ */
-    object-position: center !important; /* จัดให้รูปอยู่กึ่งกลางเสมอ */
-    transition: transform 0.2s ease !important;
+/* 3. ขยายขนาดตัวอักษรและระยะห่างเพื่อให้สมดุลกับ Popup ที่ใหญ่ขึ้น */
+.product-detail-info {
+    padding-left: 20px !important;
 }
 
-/* 3. จัดการรูปใน Lightbox ให้เท่ากันด้วย (เพื่อให้ไปทางเดียวกัน) */
-#lightboxImg {
-    width: 100% !important;
-    height: 80vh !important;
-    object-fit: contain !important; /* ใน Lightbox ใช้ contain เพื่อให้เห็นรูปครบทุกมุม */
-    background: transparent !important;
+.product-detail-info h2 {
+    font-size: 24px !important; /* เพิ่มขนาดหัวข้อ */
 }

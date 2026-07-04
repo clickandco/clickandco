@@ -514,6 +514,7 @@ function openProductDetailPopup(id) {
         oBtn.style.display = 'block';
         oBtn.href = prod.orderLink;
         oBtn.setAttribute('data-id', prod.id);
+        oBtn.classList.add('order-click-track'); // 🌟 เพิ่มบรรทัดนี้เพื่อให้ระบบแทร็กกิ้งรู้จักปุ่มนี้
     }
 
     let mainImgElement = document.getElementById('detailMainImg');
