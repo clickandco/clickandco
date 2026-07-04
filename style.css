@@ -1,21 +1,24 @@
 /* ==========================================================================
-   GLOBAL APP-LIKE SMOOTHNESS PHYSICS
+   GLOBAL APP-LIKE SMOOTHNESS PHYSICS (เวอร์ชันแก้ปัญหา Scroll Wheel ค้าง)
    ========================================================================== */
 html {
+    /* เปิดฟีเจอร์เกลี่ยระยะทางเคลื่อนที่อัตโนมัติของบราวเซอร์ ให้ภาพลื่นเนียนตา */
     scroll-behavior: smooth;
-    /* ลดแรงต้านการ Scroll บน iOS/Mobile ให้หน่วงนุ่มนวลขึ้น */
     -webkit-overflow-scrolling: touch;
+    scroll-padding-top: 20px; 
 }
 
 body {
-    /* ปรับ Rendering ตัวอักษรให้คมชัด ไม่กระตุกเวลาทำ Animation */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
-    /* ป้องกันการเผลอไฮไลท์ข้อความเวลาเบิ้ลคลิกปุ่มบนมือถือ เหมือนฟีเจอร์ใน App */
+    text-rendering: optimizeSpeed; 
     user-select: none;
     -webkit-user-select: none;
     overflow-x: hidden;
+
+    /* สั่งให้การ์ดจอ (GPU) คำนวณภาพเลื่อนหน้าจอไว้ล่วงหน้า แก้อาการภาพฉีกขาดบนจอ Hz สูง */
+    will-change: transform;
+    transform: translateZ(0);
 }
 
 /* ปรับความนุ่มนวลให้กับ Scrollbar (แถบเลื่อน) ทั่วทั้งหน้าเว็บ */
@@ -1076,9 +1079,28 @@ tbody tr:hover {
 }
 
 /* ==========================================================================
-   SECTION 14: MOBILE FORCE PORTRAIT ONLY (ล็อคหน้าจอแนวตั้งสำหรับมือถือ)
+   SECTION 14:  PERFORMANCE OPTIMIZATION FOR HIGH REFRESH RATE DISPLAYS
    ========================================================================== */
+/* สำหรับปุ่ม, การ์ดสินค้า หรือ Element ที่มีการทำ Hover/Scale/Transition */
+.product-card, 
+.btn, 
+.modal-content,
+.sidebar-menu {
+    /* บังคับให้การ์ดจอ (GPU) ช่วยเรนเดอร์ล่วงหน้า ป้องกันเฟรมเรตตก (Micro-stuttering) บนจอ Hz สูง */
+    will-change: transform, opacity;
+    
+    /* เปิดใช้งาน Hardware Acceleration แบบ 3D */
+    transform: translateZ(0); 
+    backface-visibility: hidden;
+}
 
+/* เพิ่มความสมูทเป็นพิเศษให้กับการเลื่อนสกรอลล์ในโมดอลหรือส่วนที่มี overflow */
+.modal-body, 
+div[style*="overflow-y: auto"] {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    will-change: scroll-position;
+}
 
 /* ==========================================================================
    SECTION 15: FIX MODAL DROPDOWN OVERFLOW & RESPONSIVE FORM
@@ -1380,4 +1402,3 @@ main .grid {
     margin-bottom: 12px;
     white-space: nowrap; /* ป้องกันข้อความ Coming Soon หล่นลงมาสองบรรทัด */
 }
-

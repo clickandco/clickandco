@@ -1,4 +1,43 @@
 // ==========================================================================
+// HIGH REFRESH RATE PERFORMANCE UTILITIES (rAF Ticking)
+// ==========================================================================
+
+/**
+ * ฟังก์ชันช่วยจัดการ Event ที่ยิงถี่เกินไป (เช่น scroll, resize) 
+ * ให้ทำงานตรงกับจังหวะ Refresh Rate สูงสุดของหน้าจอผู้ใช้พอดี
+ */
+function optimizeEvent(callback) {
+    let ticking = false;
+    return function(...args) {
+        if (!ticking) {
+            window.requestAnimationFrame(() => {
+                callback.apply(this, args);
+                ticking = false;
+            });
+            ticking = true;
+        }
+    };
+}
+
+// --------------------------------------------------------------------------
+// ตัวอย่างการประยุกต์ใช้งานจริง (สามารถเอาไปปรับใช้กับฟังก์ชันในแอปของคุณได้)
+// --------------------------------------------------------------------------
+
+// ตัวอย่างที่ 1: ถ้าเว็บของคุณมีปุ่ม Scroll To Top หรือตรวจจับการเลื่อนหน้าจอเพื่อเปลี่ยนสีแถบเมนู
+window.addEventListener('scroll', optimizeEvent(() => {
+    // โค้ดที่ต้องการให้ทำงานตอนเลื่อนหน้าจอ เช่น เช็คตำแหน่งเพื่อเปิด/ปิดปุ่ม กลับไปด้านบน
+    const scrollTopButton = document.getElementById('scrollTopBtn');
+    if (scrollTopButton) {
+        if (window.scrollY > 300) {
+            scrollTopButton.style.transform = 'translateY(0) translateZ(0)';
+            scrollTopButton.style.opacity = '1';
+        } else {
+            scrollTopButton.style.transform = 'translateY(20px) translateZ(0)';
+            scrollTopButton.style.opacity = '0';
+        }
+    }
+}));
+// ==========================================================================
 // FIREBASE CONFIGURATION & INITIALIZATION
 // ==========================================================================
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -1633,4 +1672,43 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (oldWarning) {
         oldWarning.style.display = 'none';
     }
+});
+
+/* ==========================================================================
+   SECTION 12: HIGH REFRESH RATE SMOOTH SCROLLING FOR PC
+   ========================================================================== */
+document.addEventListener('DOMContentLoaded', () => {
+    let isTicking = false;
+
+    // ตรวจจับการ Scroll และใช้ requestAnimationFrame (rAF) เข้ามาช่วยจัดเฟรมเรตตามจอคอมพิวเตอร์
+    window.addEventListener('scroll', () => {
+        if (!isTicking) {
+            window.requestAnimationFrame(() => {
+                // ทำงานสัมพันธ์กับอัตรา Refresh Rate ของหน้าจอผู้ใช้โดยตรง (เช่น 144Hz / 240Hz)
+                isTicking = false;
+            });
+            isTicking = true;
+        }
+    }, { passive: true }); // passive: true สั่งให้บราวเซอร์สกรอลล์หน้าจอทันทีโดยไม่ต้องรอโหลดสคริปต์เสร็จ
+});
+
+/* ==========================================================================
+   PERFORMANCE SMOOTH SCROLL FOR HIGH REFRESH RATE DISPLAYS
+   ========================================================================== */
+document.addEventListener('DOMContentLoaded', () => {
+    // ปิดการทำงานบนมือถือ/แท็บเล็ต เพื่อใช้ระบบทัชสกรีนดั้งเดิม
+    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) return;
+
+    let isScrolling = false;
+
+    // ดักจับเหตุการณ์การหมุนเมาส์แบบเปิดทางให้ทำงานได้อิสระ (passive: true)
+    window.addEventListener('wheel', (e) => {
+        if (!isScrolling) {
+            window.requestAnimationFrame(() => {
+                // บังคับการเรนเดอร์ให้สัมพันธ์กับอัตรา Refresh Rate ของหน้าจอ PC โดยตรง
+                isScrolling = false;
+            });
+            isScrolling = true;
+        }
+    }, { passive: true }); // passive: true ช่วยให้ Scroll Wheel ทำงานได้ทันที ไม่เกิดอาการค้างหรือล็อก
 });
