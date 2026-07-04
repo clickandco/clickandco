@@ -1617,19 +1617,20 @@ window.applyBulkKeywords = async function() {
     
     alert(`อัปเดต Keyword ให้สินค้าทั้งหมด ${checkedBoxes.length} รายการเรียบร้อยแล้ว!`);
 };
-/* ==========================================================================
+/* ==========================================================================\
    SECTION 11: Lock resize
    ========================================================================== */
 document.addEventListener("DOMContentLoaded", async () => {
-    // 📱 บังคับล็อกหน้าจอเป็นแนวตั้งเฉพาะบนอุปกรณ์มือถือ (ถ้าเบราว์เซอร์รองรับ)
+    // 📱 สั่งล็อกหน้าจอเป็นแนวตั้งผ่าน API (สำหรับเบราว์เซอร์มือถือบางตัวที่รองรับ)
     if (window.screen && window.screen.orientation && window.screen.orientation.lock) {
         window.screen.orientation.lock('portrait').catch(function(error) {
-            // เบราว์เซอร์บน PC หรืออุปกรณ์ที่ไม่รองรับจะไม่ทำงานและไม่แจ้ง Error ขัดจังหวะ
             console.log("Screen orientation lock is not supported on this device.");
         });
     }
-
-    await loadCategories();
-    await loadProducts();
-    await loadStats();
+    
+    // ซ่อน element แจ้งเตือนแนวนอนแบบเก่าทิ้งไปเลยเพื่อไม่ให้รบกวนหน้าจอ
+    const oldWarning = document.getElementById('orientation-warning');
+    if (oldWarning) {
+        oldWarning.style.display = 'none';
+    }
 });
