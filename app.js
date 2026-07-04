@@ -1245,7 +1245,7 @@ document.getElementById('productSortSelect').addEventListener('change', function
 });
 
 /* ==========================================================================
-   SECTION 8: APP INITIALIZATION (เปิดฉากเริ่มทำงานระบบเว็บ)
+   SECTION 8: APP INITIALIZATION & MOBILE BACK BUTTON FOR POPUPS
    ========================================================================== */
 
 document.getElementById('menuToggleBtn').onclick = () => openModal('sideMenuModal');
@@ -1265,58 +1265,77 @@ if (adminLoggedIn) {
     document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
 }
 
+// 1. ตั้งค่า State แรกสุดของหน้าเว็บป้องกันการเออร์เรอร์
 if (!history.state) {
     history.replaceState({ page: "home", category: "ทั้งหมด" }, "");
 }
 
-// 📱 ฟังก์ชันส่วนขยายเพิ่มเติมสำหรับปิด Bulk Keyword Modal
-function closeBulkKeywordModal() {
-    const bulkModal = document.getElementById('bulkKeywordModal');
-    if (bulkModal) {
-        bulkModal.classList.remove('active');
+// 2. ดักจับและเขียนทับฟังก์ชันเปิด Modal หลัก เพื่อเก็บประวัติสำหรับการย้อนกลับ (Back)
+const originalOpenModal = window.openModal;
+window.openModal = function(modalId) {
+    if (typeof originalOpenModal === 'function') {
+        originalOpenModal(modalId);
     }
-}
+    // สั่งผลัก State เข้าไปในระบบเบราว์เซอร์ เมื่อมีการเปิดป๊อปอัปใด ๆ
+    history.pushState({ modalOpen: true, activeId: modalId }, null, "");
+};
 
-// 2. ดักจับทุกครั้งเมื่อผู้ใช้งานกดปุ่ม "ย้อนกลับ" บนเบราว์เซอร์หรือโทรศัพท์มือถือ
+// 3. ดักจับฟังก์ชันเปิดคีย์บอร์ดกลุ่ม (Bulk Keyword Modal) เพื่อเก็บประวัติด้วยเช่นกัน
+const originalOpenBulkKeywordModal = window.openBulkKeywordModal;
+window.openBulkKeywordModal = function() {
+    if (typeof originalOpenBulkKeywordModal === 'function') {
+        originalOpenBulkKeywordModal();
+    }
+    // สั่งผลัก State เข้าไปในระบบเบราว์เซอร์ เมื่อเปิดตัวแก้ไขคีย์บอร์ดกลุ่ม
+    history.pushState({ modalOpen: true, activeId: 'bulkKeywordModal' }, null, "");
+};
+
+// 📱 4. ระบบดักจับปุ่ม Back บนมือถือเพื่อปิดทุกๆ Popup แบบสมบูรณ์
 window.addEventListener('popstate', function(event) {
-    // เช็คว่ามีหน้าต่าง Popup ตัวใดตัวหนึ่ง หรือ Bulk Keyword Modal กำลังเปิดอยู่หรือไม่
-    const anyModalActive = document.querySelector('.modal-overlay.active');
+    // ตรวจสอบหา Popup มาตรฐาน (.modal-overlay) ที่ติดคลาส active อยู่ในหน้าจอ
+    const activeOverlay = document.querySelector('.modal-overlay.active');
+    
+    // ตรวจสอบหาหน้าต่างจัดการ Keyword กลุ่ม (#bulkKeywordModal)
     const bulkModal = document.getElementById('bulkKeywordModal');
-    const isBulkModalActive = bulkModal && bulkModal.classList.contains('active');
+    const isBulkActive = bulkModal && bulkModal.classList.contains('active');
 
-    if (anyModalActive || isBulkModalActive) {
-        // [เคสที่ 1] ถ้ามี Popup หรือ Bulk Keyword เปิดอยู่ -> ให้ทำการปิดทั้งหมดทันที
-        closeAllModals();
-        closeBulkKeywordModal(); // 👈 เพิ่มให้ปิดหน้าต่างคีย์บอร์ดกลุ่มด้วย
+    // [เคสที่ 1] ถ้าพบว่ามีหน้าต่างใดๆ เปิดค้างอยู่บนหน้าจอ -> ให้ปิดหน้าต่างนั้นทันทีแทนการเปลี่ยนหน้าเว็บ
+    if (activeOverlay || isBulkActive) {
         
-        // ดันสเตทประวัติกลับไว้ที่เดิม เผื่อผู้ใช้ต้องการกดย้อนกลับในเมนูคัดกรองต่อ
-        history.pushState({ page: "home", category: currentFilterCategory }, "");
+        // สั่งปิด Popup ปกติของแอปคุณ
+        if (typeof window.closeAllModals === 'function') {
+            window.closeAllModals();
+        }
+        
+        // สั่งเคลียร์และปิดหน้าต่างจัดการ Keyword กลุ่ม
+        if (bulkModal) {
+            bulkModal.classList.remove('active');
+        }
+        
+        // เซ็ตสถานะประวัติหน้าเว็บกลับสู่ปกติของหมวดหมู่สินค้าที่เลือกค้างไว้
+        history.replaceState({ page: "home", category: currentFilterCategory }, "");
     } 
+    // [เคสที่ 2] หากไม่มีหน้าต่างใด ๆ เปิดอยู่ แต่ผู้ใช้เลือกหมวดหมู่อื่นอยู่ -> ให้กดย้อนกลับมาที่ "ทั้งหมด"
     else if (currentFilterCategory !== "ทั้งหมด") {
-        // [เคสที่ 2] ไม่เปิด Popup แต่หน้าเว็บคัดกรองหมวดหมู่อื่นอยู่ -> ให้ย้อนกลับมาที่หมวดหมู่ "ทั้งหมด"
         currentFilterCategory = "ทั้งหมด";
-        renderSidebar();
-        renderProducts();
-        
-        // อัปเดตสเตทปัจจุบันให้กลับมาเป็นหน้าแรกสุดสมบูรณ์
+        if (typeof renderSidebar === 'function') renderSidebar();
+        if (typeof renderProducts === 'function') renderProducts();
         history.replaceState({ page: "home", category: "ทั้งหมด" }, "");
-    } 
-    // [เคสที่ 3] หากอยู่หน้าแรก (ทั้งหมด) และไม่มีหน้าต่างใด ๆ เปิดอยู่ การกดย้อนกลับอีกครั้งจะออกจากเว็บตามปกติ
+    }
+    // [เคสที่ 3] หากอยู่หน้าแรกปกติและไม่มีป๊อปอัปค้าง การกด Back อีกครั้งจะออกจากเว็บตามปกติของเบราว์เซอร์
 });
 
-// 3. ปรับปรุงฟังก์ชันเปลี่ยนหมวดหมู่สินค้าในแผงด้านข้าง เพื่อคอยเก็บประวัติไว้ว่าผู้ใช้เปลี่ยนไปเมนูไหน
+// 5. ปรับปรุงแถบเมนูด้านข้างเพื่อเก็บบันทึกประวัติสเตทเวลาเปลี่ยนประเภทสินค้า
 const originalRenderSidebar = renderSidebar;
 renderSidebar = function() {
-    originalRenderSidebar();
+    if (typeof originalRenderSidebar === 'function') originalRenderSidebar();
     
-    // ดักจับ Event Click ของรายการเมนูย้อนหลังใหม่อีกครั้งเพื่อผูกสเตท
     document.querySelectorAll('.category-item').forEach(item => {
         item.addEventListener('click', function() {
             let selectedCat = this.getAttribute('data-cat');
             if (selectedCat === "ทั้งหมด") {
                 history.replaceState({ page: "home", category: "ทั้งหมด" }, "");
             } else {
-                // หากเปลี่ยนไปหมวดหมู่อื่น ให้บันทึกสเตทเผื่อเวลากดย้อนกลับ
                 history.pushState({ page: "home", category: selectedCat }, "");
             }
         });
