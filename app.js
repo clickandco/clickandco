@@ -95,16 +95,24 @@ async function loadProducts() {
     }
 }
 
-// ฟังก์ชันดึงข้อมูลหมวดหมู่จาก Firestore
+// ฟังก์ชันดึงข้อมูลหมวดหมู่จาก Firestore (ปรับปรุงใหม่: เรียงลำดับแบรนด์ตาม A-Z ตอนโหลดข้อมูล)
 async function loadCategories() {
     try {
         const querySnapshot = await getDocs(categoriesCollection);
         if (!querySnapshot.empty) {
             querySnapshot.forEach((doc) => {
-                categories[doc.id] = doc.data().items || [];
+                let itemsArray = doc.data().items || [];
+                // 🌟 เรียงลำดับ A-Z เฉพาะแบรนด์ (brand) ส่วนหมวดหมู่อื่นปล่อยไว้ตามเดิม
+                if (doc.id === "brand") {
+                    categories[doc.id] = itemsArray.sort((a, b) => a.localeCompare(b, 'th'));
+                } else {
+                    categories[doc.id] = itemsArray;
+                }
             });
         } else {
-            // ถ้าไม่มีข้อมูลใน Firestore ให้เซ็ตค่าเริ่มต้นขึ้นไป
+            // ถ้าไม่มีข้อมูลใน Firestore ให้เซ็ตค่าเริ่มต้นขึ้นไป (เรียงลำดับแบรนด์ก่อนส่ง)
+            categories.brand.sort((a, b) => a.localeCompare(b, 'th'));
+
             await setDoc(doc(db, "categories", "main"), { items: categories.main });
             await setDoc(doc(db, "categories", "sub"), { items: categories.sub });
             await setDoc(doc(db, "categories", "brand"), { items: categories.brand });
@@ -449,6 +457,7 @@ window.addEventListener('keydown', (e) => {
     }
 });
 
+// ฟังก์ชันเปิดป๊อปอัปหมวดหมู่ย่อย (ปรับปรุงใหม่: เรียงลำดับปุ่มแบรนด์สินค้าตาม A-Z)
 function openSubCatPopup(mainCatTitle) {
     document.getElementById('subCatTitle').innerText = mainCatTitle;
     const subArea = document.getElementById('subCatGroupArea');
@@ -456,6 +465,7 @@ function openSubCatPopup(mainCatTitle) {
     
     subArea.innerHTML = ""; brandArea.innerHTML = "";
 
+    // 1. หมวดหมู่ย่อย: คัดกรองตามปกติ ไม่ต้องเรียงลำดับ A-Z
     const availableSubsInThisCat = categories.sub.filter(sub => {
         return products.some(p => p.mainCat === mainCatTitle && p.subCat === sub);
     });
@@ -470,9 +480,10 @@ function openSubCatPopup(mainCatTitle) {
         });
     }
 
-    const availableBrandsInThisCat = categories.brand.filter(b => {
-        return products.some(p => p.mainCat === mainCatTitle && p.brand === b);
-    });
+    // 2. แบรนด์สินค้า: คัดกรองพร้อมจัดเรียงลำดับจาก A-Z 🌟
+    const availableBrandsInThisCat = categories.brand
+        .filter(b => products.some(p => p.mainCat === mainCatTitle && p.brand === b))
+        .sort((a, b) => a.localeCompare(b, 'th')); // 🌟 จัดเรียง A-Z ที่จุดนี้
 
     if (availableBrandsInThisCat.length === 0) {
         brandArea.innerHTML = `<span style="font-size:0.9rem; color:#aaa; padding:5px;">ไม่มีแบรนด์สินค้าในหมวดหมู่นี้</span>`;
