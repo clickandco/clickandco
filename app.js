@@ -325,7 +325,7 @@ function renderProducts(customProductsList = null) {
                     ${prod.isMall ? '<span class="mall-prefix">MALL</span>' : ''}${prod.name}
                 </div>
                 <div class="product-meta">${prod.mainCat} > ${prod.subCat} > ${prod.brand}</div>
-                <div class="product-price">${formatMoney(displayPrice)} บาท</div>
+                <div class="product-price">${prod.isComingSoon ? 'Coming Soon...' : formatMoney(displayPrice) + ' บาท'}</div>
             </div>
             ${prod.isComingSoon ? '<button class="order-btn" disabled style="opacity:0.6;">เร็วๆ นี้</button>' : `<a href="${prod.orderLink}" class="order-btn order-click-track" data-id="${prod.id}" target="_blank">สั่งซื้อ</a>`}
         `;
@@ -462,10 +462,10 @@ function openSubCatPopup(mainCatTitle) {
     document.getElementById('subCatTitle').innerText = mainCatTitle;
     const subArea = document.getElementById('subCatGroupArea');
     const brandArea = document.getElementById('brandGroupArea');
-    
-    subArea.innerHTML = ""; brandArea.innerHTML = "";
+    subArea.innerHTML = "";
+    brandArea.innerHTML = "";
 
-    // 1. หมวดหมู่ย่อย: คัดกรองตามปกติ ไม่ต้องเรียงลำดับ A-Z
+    // 1. หมวดหมู่ย่อย: คัดกรองและคำนวณจำนวนสินค้า
     const availableSubsInThisCat = categories.sub.filter(sub => {
         return products.some(p => p.mainCat === mainCatTitle && p.subCat === sub);
     });
@@ -474,23 +474,41 @@ function openSubCatPopup(mainCatTitle) {
         subArea.innerHTML = `<span style="font-size:0.9rem; color:#aaa; padding:5px;">ไม่มีหมวดหมู่ย่อยในหมวดหมู่นี้</span>`;
     } else {
         availableSubsInThisCat.forEach(sub => {
-            let btn = document.createElement('button'); btn.className = "pill-btn"; btn.innerText = sub;
-            btn.onclick = () => { filterBySpecifics(mainCatTitle, sub, null); closeModal('subCatPopup'); };
+            // คำนวณจำนวนสินค้าภายใต้หมวดหมู่หลัก + หมวดหมู่ย่อยนี้
+            let subCount = products.filter(p => p.mainCat === mainCatTitle && p.subCat === sub).length;
+
+            let btn = document.createElement('button');
+            btn.className = "pill-btn";
+            // แสดงผลเป็น "ชื่อหมวดหมู่ย่อย (จำนวน)"
+            btn.innerHTML = `<span>${sub}</span> <span class="badge-count" style="font-size:0.8rem; margin-left:6px; opacity:0.6; font-weight:normal;">(${subCount})</span>`;
+            btn.onclick = () => {
+                filterBySpecifics(mainCatTitle, sub, null);
+                closeModal('subCatPopup');
+            };
             subArea.appendChild(btn);
         });
     }
 
-    // 2. แบรนด์สินค้า: คัดกรองพร้อมจัดเรียงลำดับจาก A-Z 🌟
+    // 2. แบรนด์สินค้า: คัดกรองพร้อมจัดเรียงลำดับจาก A-Z และคำนวณจำนวนสินค้า
     const availableBrandsInThisCat = categories.brand
         .filter(b => products.some(p => p.mainCat === mainCatTitle && p.brand === b))
-        .sort((a, b) => a.localeCompare(b, 'th')); // 🌟 จัดเรียง A-Z ที่จุดนี้
+        .sort((a, b) => a.localeCompare(b, 'th'));
 
     if (availableBrandsInThisCat.length === 0) {
         brandArea.innerHTML = `<span style="font-size:0.9rem; color:#aaa; padding:5px;">ไม่มีแบรนด์สินค้าในหมวดหมู่นี้</span>`;
     } else {
         availableBrandsInThisCat.forEach(b => {
-            let btn = document.createElement('button'); btn.className = "pill-btn"; btn.innerText = b;
-            btn.onclick = () => { filterBySpecifics(mainCatTitle, null, b); closeModal('subCatPopup'); };
+            // คำนวณจำนวนสินค้าภายใต้หมวดหมู่หลัก + แบรนด์นี้
+            let brandCount = products.filter(p => p.mainCat === mainCatTitle && p.brand === b).length;
+
+            let btn = document.createElement('button');
+            btn.className = "pill-btn";
+            // แสดงผลเป็น "ชื่อแบรนด์ (จำนวน)"
+            btn.innerHTML = `<span>${b}</span> <span class="badge-count" style="font-size:0.8rem; margin-left:6px; opacity:0.6; font-weight:normal;">(${brandCount})</span>`;
+            btn.onclick = () => {
+                filterBySpecifics(mainCatTitle, null, b);
+                closeModal('subCatPopup');
+            };
             brandArea.appendChild(btn);
         });
     }
@@ -515,7 +533,19 @@ function openProductDetailPopup(id) {
     if (!prod) return;
 
     document.getElementById('detailTitle').innerHTML = `${prod.isMall ? '<span class="mall-prefix">MALL</span>':''}${prod.name}`;
-    document.getElementById('detailPrice').innerText = formatMoney(calculateDiscountedPrice(prod.price, prod.discountCode));
+
+    // ส่วนแก้ไขการแสดงผลราคาในหน้า Popup
+    const priceElement = document.getElementById('detailPrice');
+    const currencyElement = priceElement.parentElement.querySelector('.currency');
+
+    if (prod.isComingSoon) {
+        priceElement.innerText = "Coming Soon...";
+        if (currencyElement) currencyElement.style.display = 'none'; // ซ่อนคำว่า "บาท"
+    } else {
+        priceElement.innerText = formatMoney(calculateDiscountedPrice(prod.price, prod.discountCode));
+        if (currencyElement) currencyElement.style.display = 'inline'; // แสดงคำว่า "บาท" ตามปกติ
+    }
+
     document.getElementById('detailDesc').innerText = prod.desc;
     
     let oBtn = document.getElementById('detailOrderBtn');
@@ -621,12 +651,59 @@ function openProductDetailPopup(id) {
     mainImgElement.onclick = function() {
         lightboxImagesArray = localImagesArray; // ส่งค่าส่งต่อให้ Lightbox สไลด์ภาพได้ถูกต้อง
         
-        // ค้นหาว่าตอนนี้รูปใหญ่ที่แสดงอยู่ ตรงกับอินเด็กซ์ไหนใน localImagesArray
+        // 🔍 แก้ไข: ถอด Domain หรือ Path ส่วนเกินออก เพื่อจับคู่ชื่อรูปภาพในอาร์เรย์ให้แม่นยำที่สุด
         const currentSrc = mainImgElement.getAttribute('src');
-        const foundIndex = localImagesArray.indexOf(currentSrc);
+        let foundIndex = localImagesArray.indexOf(currentSrc);
+        
+        // หากค้นหาตรงๆ ไม่เจอ (กรณีติด URL เต็ม) ให้ค้นด้วยวิธีเช็คข้อความท้ายชื่อไฟล์
+        if (foundIndex === -1) {
+            foundIndex = localImagesArray.findIndex(img => currentSrc.includes(img) || img.includes(currentSrc));
+        }
+        
+        // ถ้าหาเจอให้ใช้ตำแหน่งนั้น ถ้าไม่เจอจริงๆ ค่อยใช้ 0 (รูปแรก)
         currentLightboxIndex = foundIndex !== -1 ? foundIndex : 0;
         
-        document.getElementById('lightboxImg').src = lightboxImagesArray[currentLightboxIndex];
+        const lightboxImg = document.getElementById('lightboxImg');
+        lightboxImg.src = lightboxImagesArray[currentLightboxIndex];
+
+        // 📱 เพิ่มระบบปัดนิ้วสัมผัส (Swipe) สำหรับ Lightbox บนมือถือ
+        let lbTouchStartX = 0;
+        let lbTouchEndX = 0;
+
+        lightboxImg.ontouchstart = null;
+        lightboxImg.ontouchend = null;
+
+        lightboxImg.addEventListener('touchstart', function(e) {
+            lbTouchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        lightboxImg.addEventListener('touchend', function(e) {
+            lbTouchEndX = e.changedTouches[0].screenX;
+            
+            const swipeThreshold = 50; 
+            if (lbTouchStartX - lbTouchEndX > swipeThreshold) {
+                // ปัดซ้าย -> ถัดไป
+                const nextBtn = document.getElementById('lightboxNext');
+                if (nextBtn && nextBtn.style.display !== 'none') nextBtn.click();
+            } 
+            else if (lbTouchEndX - lbTouchStartX > swipeThreshold) {
+                // ปัดขวา -> ย้อนกลับ
+                const prevBtn = document.getElementById('lightboxPrev');
+                if (prevBtn && prevBtn.style.display !== 'none') prevBtn.click();
+            }
+        }, { passive: true });
+
+        // 🌟 แก้ไข: เรียกฟังก์ชันอัปเดตสถานะปุ่ม ซ้าย-ขวา ทันทีที่เปิด เพื่อให้ปุ่มแสดงผลถูกต้องตามจริง
+        if (typeof updateLightboxButtons === 'function') {
+            updateLightboxButtons();
+        } else {
+            // โค้ดสำรองหากไม่มีฟังก์ชันแยก: แสดง/ซ่อนปุ่มตามลำดับ
+            const prevBtn = document.getElementById('lightboxPrev');
+            const nextBtn = document.getElementById('lightboxNext');
+            if(prevBtn) prevBtn.style.display = currentLightboxIndex === 0 ? 'none' : 'block';
+            if(nextBtn) nextBtn.style.display = currentLightboxIndex === lightboxImagesArray.length - 1 ? 'none' : 'block';
+        }
+        
         openModal('lightboxModal');
     };
 
@@ -1540,3 +1617,19 @@ window.applyBulkKeywords = async function() {
     
     alert(`อัปเดต Keyword ให้สินค้าทั้งหมด ${checkedBoxes.length} รายการเรียบร้อยแล้ว!`);
 };
+/* ==========================================================================
+   SECTION 11: Lock resize
+   ========================================================================== */
+document.addEventListener("DOMContentLoaded", async () => {
+    // 📱 บังคับล็อกหน้าจอเป็นแนวตั้งเฉพาะบนอุปกรณ์มือถือ (ถ้าเบราว์เซอร์รองรับ)
+    if (window.screen && window.screen.orientation && window.screen.orientation.lock) {
+        window.screen.orientation.lock('portrait').catch(function(error) {
+            // เบราว์เซอร์บน PC หรืออุปกรณ์ที่ไม่รองรับจะไม่ทำงานและไม่แจ้ง Error ขัดจังหวะ
+            console.log("Screen orientation lock is not supported on this device.");
+        });
+    }
+
+    await loadCategories();
+    await loadProducts();
+    await loadStats();
+});
