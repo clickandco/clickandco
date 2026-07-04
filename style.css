@@ -520,15 +520,30 @@ body {
     padding: 10px;
     border: none;
     border-radius: 12px;
-    background: var(--bg-app);
-    box-shadow: var(--shadow-liquid-out);
-    color: var(--accent-color);
+    /* เปลี่ยนจากสีส้มเดิม เป็นสีเขียวสดใส (Linear Gradient) */
+    background: linear-gradient(135deg, #2ecc71, #27ae60); 
+    color: #ffffff; 
+    /* ปรับเงาให้เป็นเรืองแสงสีเขียวเบาๆ */
+    box-shadow: 0 4px 12px rgba(46, 204, 113, 0.35); 
     font-weight: 600;
     cursor: pointer;
     text-align: center;
     text-decoration: none;
     display: block;
     transition: all 0.2s ease;
+}
+/* เอฟเฟกต์เวลาเอาเมาส์ชี้ให้ดูวาวขึ้น */
+.order-btn:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 6px 16px rgba(46, 204, 113, 0.5);
+    transform: translateY(-1px);
+}
+.order-btn:active { box-shadow: var(--shadow-liquid-in); }
+/* เอฟเฟกต์เวลาเอาเมาส์ชี้ให้ดูวาวขึ้น */
+.order-btn:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 6px 16px rgba(230, 126, 34, 0.5);
+    transform: translateY(-1px);
 }
 .order-btn:active { box-shadow: var(--shadow-liquid-in); }
 
@@ -729,8 +744,26 @@ body {
 .thumb-img.active { border-color: var(--accent-color); }
 .detail-price-box { font-size: 1.8rem; font-weight: bold; color: var(--text-main); margin: 15px 0; }
 .detail-desc-box { background: rgba(0,0,0,0.02); padding: 15px; border-radius: 12px; max-height: 200px; overflow-y: auto; margin-bottom: 20px; }
-.order-btn-big { display: block; text-align: center; background: #2ecc71; color: white; padding: 15px; border-radius: 14px; font-weight: bold; text-decoration: none; box-shadow: 0 6px 20px rgba(46, 204, 113, 0.25); }
-
+.order-btn-big { 
+    display: block; 
+    text-align: center; 
+    /* สีเขียว Premium ไล่เฉดสี */
+    background: linear-gradient(135deg, #2ecc71, #27ae60); 
+    color: white; 
+    padding: 15px; 
+    border-radius: 14px; 
+    font-weight: bold; 
+    text-decoration: none; 
+    /* เงาเรืองแสงสีเขียวหนานุ่ม */
+    box-shadow: 0 8px 24px rgba(46, 204, 113, 0.4); 
+    font-size: 1.1rem;
+    transition: all 0.25s ease;
+}
+.order-btn-big:hover {
+    filter: brightness(1.08);
+    box-shadow: 0 10px 28px rgba(46, 204, 113, 0.55);
+    transform: scale(1.02);
+}
 .lightbox-overlay { background: rgba(0,0,0,0.8); }
 .lightbox-container { position: relative; max-width: 90%; max-height: 80vh; }
 .lightbox-container img { max-width: 100%; max-height: 80vh; border-radius: 8px; object-fit: contain; }
@@ -1121,4 +1154,173 @@ tbody tr:hover {
     .app-container {
         display: none !important;
     }
+}
+/* ==========================================================================
+   SECTION 17: SMOOTH HOVER & PREMIUM MICRO-INTERACTIONS (ส่วนเสริมใหม่)
+   ========================================================================== */
+
+/* --- 1. SMOOTH EXPANSION FOR ORDER BUTTONS (ปุ่มสั่งซื้อขยายนุ่มนวล) --- */
+.order-btn, .order-btn-big {
+    /* กำหนดการเปลี่ยนแปลงให้ใช้ cubic-bezier ระดับ Premium เพื่อความลื่นไหลสูง */
+    transition: 
+        transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), 
+        box-shadow 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), 
+        filter 0.25s ease !important;
+}
+
+/* เอฟเฟกต์ชี้เมาส์ปุ่มสั่งซื้อ: ขยายตัวขึ้นเล็กน้อย + เงาเรืองแสงสีเขียวนุ่มนวลกระจายตัว */
+.order-btn:hover {
+    transform: scale(1.04) translateY(-2px) !important;
+    filter: brightness(1.06) !important;
+    box-shadow: 0 8px 20px rgba(46, 204, 113, 0.45) !important;
+}
+
+.order-btn-big:hover {
+    transform: scale(1.03) translateY(-2px) !important;
+    filter: brightness(1.06) !important;
+    box-shadow: 0 12px 32px rgba(46, 204, 113, 0.55) !important;
+}
+
+
+/* --- 2. PREMIUM HOVER EFFECTS FOR MENUS & BUTTONS (เอฟเฟกต์ชี้เมนูและปุ่มทั่วไป) --- */
+
+/* ไอคอน เมนู และปุ่มอื่นๆ ทั่วไป */
+button, .btn, a, .menu-toggle-btn, .close-modal-btn, .glass-select, .pill-btn, .category-item {
+    transition: 
+        transform 0.25s cubic-bezier(0.25, 0.8, 0.25, 1), 
+        background-color 0.25s ease, 
+        box-shadow 0.25s cubic-bezier(0.25, 0.8, 0.25, 1), 
+        color 0.2s ease !important;
+}
+
+/* เมนูหมวดหมู่ฝั่งซ้าย (Sidebar) เวลาชี้ */
+.category-item:hover {
+    transform: translateX(4px) scale(1.01);
+    background: var(--bg-app) !important;
+    box-shadow: var(--shadow-liquid-out) !important; /* เปลี่ยนจากเงายุบเป็นเงานูนต่ำเพื่อให้ดูเด่นขึ้น */
+}
+
+/* เมนูหมวดหมู่บนมือถือ (จัดให้อยู่ตรงกลาง ไม่เบี้ยวขวา) */
+@media (max-width: 768px) {
+    .category-item:hover {
+        transform: scale(1.03) !important;
+    }
+}
+
+/* ปุ่ม Toggle Menu และ ปุ่มเลือกแท็บ (Pill) */
+.menu-toggle-btn:hover, .pill-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(163, 177, 198, 0.4);
+    color: var(--accent-color);
+}
+
+/* ปุ่มกากบาทปิดโมดอล */
+.close-modal-btn:hover {
+    transform: scale(1.1) rotate(90deg) !important; /* ขยายพร้อมหมุนกากบาทเล็กน้อยเพิ่มความลูกเล่น */
+    background: #fff0f0 !important;
+    color: #e74c3c !important;
+}
+
+
+/* --- 3. MOBILE-RESPONSIVE CLICK FEEDBACK (เอฟเฟกต์แรงกดเวลากดปุ่ม) --- */
+
+/* เมื่อคลิกปุ่มทุกชนิด จะเกิดการยุบตัวลงไปชั่วขณะ ให้ความรู้สึกมั่นคง (Tactile Feedback) */
+button:active, 
+.btn:active, 
+.menu-toggle-btn:active, 
+.order-btn:active, 
+.order-btn-big:active, 
+.pill-btn:active, 
+.category-item:active, 
+.close-modal-btn:active {
+    transform: scale(0.94) translateY(0) !important; /* หดตัวลง 6% เพื่อเลียนแบบแรงกดนิ้ว */
+    filter: brightness(0.9) !important; /* มืดลงเล็กน้อยสร้างมิติเงา */
+    box-shadow: var(--shadow-liquid-in) !important; /* เปลี่ยนเป็นเงาจมเข้าด้านใน */
+    transition: transform 0.08s ease, filter 0.08s ease !important; /* จังหวะยุบต้องเร็วเพื่อความสมจริง */
+}
+
+/* ==========================================================================
+   SECTION 18: AUTOMATIC ATTENTION-GRABBER ANIMATION (เอฟเฟกต์เด้งออโต้ดึงดูดสายตา)
+   ========================================================================== */
+
+/* 1. สั่งให้ปุ่มสั่งซื้อเล่นแอนิเมชันดึงดูดสายตาโดยอัตโนมัติ */
+.order-btn, .order-btn-big {
+    /* เรียกใช้แอนิเมชันชื่อ ขยับเด้ง (pulseAttract) ทำงานวนลูปไปเรื่อยๆ ทุกๆ 2.5 วินาที */
+    animation: pulseAttract 2.5s infinite ease-in-out;
+}
+
+/* 2. เมื่อผู้ใช้งานเอาเมาส์ชี้ (Hover) ให้หยุดเล่นแอนิเมชันออโต้ทันที เพื่อให้ระบบขยายแบบ Smooth ใน Section 17 ทำงานได้อย่างสมบูรณ์ */
+.order-btn:hover, .order-btn-big:hover {
+    animation-play-state: paused !important;
+}
+
+/* 3. กำหนดจังหวะการเด้ง (Keyframes) แบบนุ่มนวล ไม่กระตุกตา */
+@keyframes pulseAttract {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 4px 12px rgba(46, 204, 113, 0.35);
+    }
+    /* จังหวะที่ 15%: ปุ่มจะขยายตัวขึ้นเล็กน้อยพร้อมเรืองแสงเพื่อเรียกร้องความสนใจ */
+    15% {
+        transform: scale(1.03) translateY(-1px);
+        box-shadow: 0 6px 18px rgba(46, 204, 113, 0.5);
+        filter: brightness(1.04);
+    }
+    /* จังหวะที่ 30%: หดกลับมาขนาดปกติเบาๆ */
+    30% {
+        transform: scale(1);
+        box-shadow: 0 4px 12px rgba(46, 204, 113, 0.35);
+    }
+    /* จังหวะที่ 45%: เด้งย้ำอีกหนึ่งครั้งสั้นๆ (Double Pulse เหมือนจังหวะหัวใจเต้น) */
+    45% {
+        transform: scale(1.02);
+        box-shadow: 0 5px 14px rgba(46, 204, 113, 0.45);
+    }
+    /* จังหวะที่ 60% ถึง 100%: ปล่อยปุ่มนิ่งสนิทชั่วครู่ เพื่อไม่ให้เว็บดูรกหรือขยับลนลานจนเกินไป */
+    60% {
+        transform: scale(1);
+        box-shadow: 0 4px 12px rgba(46, 204, 113, 0.35);
+    }
+}
+
+/* ==========================================================================
+   SECTION 19: PREMIUM PRODUCT CARD HOVER ZOOM - FIXED SPACING (แก้ไขติด Search Bar)
+   ========================================================================== */
+
+/* เพิ่มมิติช่องว่างระหว่างโซนสินค้ากับ Search Bar ด้านบน เพื่อให้มีพื้นที่ตอนการ์ดขยาย */
+.products-grid, 
+#productsContainer,
+main .grid { 
+    margin-top: 24px !important; /* เพิ่มช่องว่างด้านบนของตระกร้าสินค้าทั้งหมด */
+}
+
+.product-card {
+    /* ใช้ Ultra-Smooth Cubic-Bezier (จังหวะฟิสิกส์แบบแอปพรีเมียม) 
+       เพิ่มเวลาเป็น 0.45s เพื่อให้จังหวะขยายดูสมูท ละมุนสายตามากที่สุด */
+    transition: 
+        transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), 
+        box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+        border-color 0.3s ease,
+        background-color 0.3s ease !important;
+    
+    /* เตรียมพร้อมสำหรับเอฟเฟกต์ 3D Layer */
+    will-change: transform, box-shadow;
+}
+
+/* เอฟเฟกต์เวลาเอาเมาส์ชี้ที่กล่องสินค้า */
+.product-card:hover {
+    /* ลดการยกตัวขึ้น (translateY) เหลือ -4px เพื่อไม่ให้หัวทิ่มไปชน Search Bar 
+       แต่ยังคงความใหญ่สะดุดตาที่ 5% (scale(1.05)) แบบสมูทๆ ไว้เหมือนเดิม */
+    transform: translateY(-4px) scale(1.05) !important;
+    
+    /* เพิ่มมิติเงา (Shadow Depth) ให้หนาและฟุ้งกว้างขึ้น รับกับการที่ตัวกล่องลอยสูงขึ้น */
+    box-shadow: 
+        0 20px 38px rgba(163, 177, 198, 0.6), 
+        -8px -8px 24px rgba(255, 255, 255, 0.95) !important;
+        
+    /* เพิ่มความสว่างตรงขอบให้ดูใสเป็นประกายกระจก (Glassmorphism) ขับให้สินค้าดูเด่นออกมา */
+    border-color: rgba(255, 255, 255, 1) !important;
+    
+    /* ดันให้ชิ้นที่กำลัง Hover ลอยอยู่บนเลเยอร์สูงสุด ไม่โดนขอบ Search Bar หรือกล่องข้างๆ บัง */
+    z-index: 99 !important;
 }
