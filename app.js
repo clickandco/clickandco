@@ -716,7 +716,7 @@ document.getElementById('loginForm').onsubmit = async function(e) {
         sessionStorage.setItem('6ickboy_admin_logged', JSON.stringify(true));
         
         document.body.classList.add('admin-mode-active');
-        document.getElementById('statusText').innerText = `โหมดผู้ดูแล (${email})`;
+        document.getElementById('statusText').innerText = `โหมดผู้ดูแล`;
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
         
         closeModal('loginModal');
