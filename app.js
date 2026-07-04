@@ -416,8 +416,6 @@ function openModal(id) {
     const modal = document.getElementById(id);
     if (modal) {
         modal.classList.add('active');
-        
-        // ตรวจสอบว่าเคยใส่สถานะนี้ในประวัติเบราว์เซอร์หรือยัง ถ้ายังให้บันทึกไว้ว่ามี Popup เปิดอยู่
         if (!history.state || history.state.popup !== true) {
             history.pushState({ popup: true }, "");
         }
@@ -431,9 +429,7 @@ function closeModal(id) {
     }
 }
 
-// ฟังก์ชันเพิ่มเติมสำหรับสั่งปิดหน้าต่าง Popup ทุกตัวที่เปิดค้างไว้
 function closeAllModals() {
-    // ดึงป๊อปอัปทุกตัวที่มีคลาส .modal-overlay หรือหน้าต่างคีย์บอร์ดกลุ่มมาปลดคลาส active ออกทั้งหมด
     document.querySelectorAll('.modal-overlay, #bulkKeywordModal').forEach(modal => {
         modal.classList.remove('active');
     });
@@ -446,14 +442,10 @@ document.querySelectorAll('.modal-overlay').forEach(overlay => {
         }
     });
 });
+
 window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         document.querySelectorAll('.modal-overlay').forEach(o => o.classList.remove('active'));
-    }
-});
-window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        document.querySelectorAll('.modal-overlay').forEach(o => o.style.display = 'none');
     }
 });
 
@@ -502,9 +494,11 @@ function filterBySpecifics(main, sub, brand) {
     renderProducts(list);
 }
 
+// 🌟 ตัวแปรกลางสำหรับระบบ Lightbox เต็มจอเท่านั้น
 let lightboxImagesArray = [];
 let currentLightboxIndex = 0;
 
+// 🌟 [ปรับปรุงใหม่] ฟังก์ชันเปิดแสดงรายละเอียดสินค้าและลากจัดเรียงรูปภาพย่อยอย่างอิสระ
 function openProductDetailPopup(id) {
     let prod = products.find(p => p.id === id);
     if (!prod) return;
@@ -531,21 +525,23 @@ function openProductDetailPopup(id) {
     let dotsContainer = document.getElementById('detailMainImgDots');
     if (dotsContainer) dotsContainer.innerHTML = "";
 
-    let allImgs = [prod.mainImg, ...(prod.images || [])].filter(url => url && url.trim() !== "");
-    lightboxImagesArray = allImgs;
+    // ดึงชุดข้อมูลรูปภาพของสินค้าชิ้นปัจจุบันออกมาอย่างเป็นเอกเทศ
+    let localImagesArray = [prod.mainImg, ...(prod.images || [])].filter(url => url && url.trim() !== "");
 
-    allImgs.forEach((url, index) => {
+    localImagesArray.forEach((url, index) => {
         let img = document.createElement('img');
         img.className = `thumb-img ${index === 0 ? 'active' : ''}`;
         img.src = url;
         img.setAttribute('data-index', index);
+        img.setAttribute('data-url', url); // ระบุ URL แท้จริงไว้ที่ตัว Element
         
         let dot = document.createElement('div');
         dot.className = `preview-dot ${index === 0 ? 'active' : ''}`;
         dot.setAttribute('data-index', index);
 
-       function updateActiveElements() {
-            document.querySelectorAll('.thumb-img').forEach(t => t.classList.remove('active'));
+        function updateActiveElements() {
+            if (!thumbContainer) return;
+            thumbContainer.querySelectorAll('.thumb-img').forEach(t => t.classList.remove('active'));
             img.classList.add('active');
             if (dotsContainer) {
                 dotsContainer.querySelectorAll('.preview-dot').forEach(d => d.classList.remove('active'));
@@ -554,7 +550,7 @@ function openProductDetailPopup(id) {
             mainImgElement.src = url;
         }
 
-        // ✅ แก้ไข: ดักจับ Event และเพิ่ม stopPropagation เพื่อไม่ให้คลิกทะลุไปปิดหน้าต่าง
+        // ล้าง Event Listener ซ้ำซ้อนที่เคยมีออก ป้องกันการเรียกใช้เบิ้ลสองรอบ
         img.onclick = function(e) { 
             if (e) e.stopPropagation(); 
             updateActiveElements(); 
@@ -565,40 +561,54 @@ function openProductDetailPopup(id) {
             updateActiveElements(); 
         };
 
-        img.onclick = function() { updateActiveElements(); };
-        dot.onclick = function() { updateActiveElements(); };
-
         thumbContainer.appendChild(img);
         if (dotsContainer) dotsContainer.appendChild(dot);
     });
 
+    // เปิดระบบลากจัดเรียงรูปภาพย่อยเฉพาะฝั่งแอดมิน (Force Fallback เพื่อให้มือถือลากได้อย่างอิสระต่อเนื่อง)
     if (adminLoggedIn) {
-        new Sortable(thumbContainer, {
+        // หากเคยมีตัวตรวจจับเก่าค้างอยู่ ให้ทำลายทิ้งก่อนเพื่อป้องกัน ID สินค้าสับสน
+        if (thumbContainer.sortableInstance) {
+            thumbContainer.sortableInstance.destroy();
+        }
+
+        thumbContainer.sortableInstance = new Sortable(thumbContainer, {
             animation: 150,
+            forceFallback: true, // บังคับใช้โหมดเสมือนเพื่อให้มือถือลากได้ราบรื่นต่อเนื่อง
+            fallbackTolerance: 3,
             onEnd: async function() {
                 let reorderedUrls = [];
+                // วนลูปอ่านค่าเฉพาะรูปภาพที่อยู่ในกล่องแสดงผลของสินค้าปัจจุบันเท่านั้น
                 thumbContainer.querySelectorAll('.thumb-img').forEach(img => {
-                    reorderedUrls.push(img.src);
+                    reorderedUrls.push(img.getAttribute('data-url'));
                 });
+                
                 if (reorderedUrls.length > 0) {
-                    prod.mainImg = reorderedUrls[0];
-                    prod.images = reorderedUrls.slice(1);
+                    // ตรวจสอบเช็คความปลอดภัย ค้นหา Object สินค้าใหม่อีกรอบผ่าน ID ป้องกันการจำผิดชิ้น
+                    let currentProd = products.find(p => p.id === id);
+                    if (!currentProd) return;
+
+                    currentProd.mainImg = reorderedUrls[0];
+                    currentProd.images = reorderedUrls.slice(1);
                     
-                    // บันทึกลง Firestore แบบ Realtime
-                    await updateDoc(doc(db, "products", prod.id), {
-                        mainImg: prod.mainImg,
-                        images: prod.images
+                    // บันทึกลงฐานข้อมูลเฉพาะของสินค้า ID นั้นๆ โดยตรง
+                    await updateDoc(doc(db, "products", currentProd.id), {
+                        mainImg: currentProd.mainImg,
+                        images: currentProd.images
                     });
 
                     saveDataBackup();
                     renderProducts();
-                    openProductDetailPopup(prod.id);
+                    // รีโหลดหน้าต่างป๊อปอัปให้แสดงลำดับใหม่ล่าสุดทันที
+                    openProductDetailPopup(currentProd.id);
                 }
             }
         });
     }
 
+    // เมื่อคลิกที่รูปใหญ่เพื่อขยายโหมด Lightbox เต็มจอ
     mainImgElement.onclick = function() {
+        lightboxImagesArray = localImagesArray; // ส่งค่าส่งต่อให้ Lightbox สไลด์ภาพได้ถูกต้อง
         currentLightboxIndex = 0;
         let activeThumb = thumbContainer.querySelector('.thumb-img.active');
         if (activeThumb) currentLightboxIndex = parseInt(activeThumb.getAttribute('data-index'));
@@ -608,66 +618,55 @@ function openProductDetailPopup(id) {
     };
 
     openModal('productDetailModal');
-    // 📱 [เพิ่มใหม่] ระบบปัดหน้าจอ (Swipe) สำหรับมือถือในหน้าต่างสินค้า
+
+    // 📱 ระบบปัดหน้าจอ (Swipe) สำหรับเปลี่ยนรูปบนมือถือ
     let touchStartX = 0;
     let touchEndX = 0;
 
-    // ดักจับจุดที่เริ่มแตะนิ้วลงบนรูปภาพหลัก
     mainImgElement.addEventListener('touchstart', function(e) {
         touchStartX = e.changedTouches[0].screenX;
     }, { passive: true });
 
-    // ดักจับจุดที่ยกนิ้วขึ้นจากรูปภาพหลัก
     mainImgElement.addEventListener('touchend', function(e) {
         touchEndX = e.changedTouches[0].screenX;
         handleSwipeGesture();
     }, { passive: true });
 
-    // ฟังก์ชันคำนวณทิศทางการปัดนิ้ว
     function handleSwipeGesture() {
-        // หาตำแหน่งรูปปัจจุบันจากรูปย่อยที่ติดคลาส active อยู่
         const activeThumb = thumbContainer.querySelector('.thumb-img.active');
         if (!activeThumb) return;
 
         let currentIndex = parseInt(activeThumb.getAttribute('data-index'));
         let nextIndex = currentIndex;
-        
-        // คำนวณระยะทางที่ปัดนิ้ว (ต้องปัดมากกว่า 50px ถึงจะทำงาน เพื่อป้องกันมือลั่น)
         const swipeThreshold = 50; 
         
         if (touchStartX - touchEndX > swipeThreshold) {
-            // 👈 ปัดนิ้วไปทางซ้าย = เลื่อนดูรูปถัดไป (ไปข้างหน้า)
-            nextIndex = (currentIndex + 1) % lightboxImagesArray.length;
+            nextIndex = (currentIndex + 1) % localImagesArray.length;
             triggerImageChange(nextIndex);
         } 
         else if (touchEndX - touchStartX > swipeThreshold) {
-            // 👉 ปัดนิ้วไปทางขวา = เลื่อนดูรูปก่อนหน้า (ย้อนกลับ)
-            nextIndex = (currentIndex - 1 + lightboxImagesArray.length) % lightboxImagesArray.length;
+            nextIndex = (currentIndex - 1 + localImagesArray.length) % localImagesArray.length;
             triggerImageChange(nextIndex);
         }
     }
 
-    // ฟังก์ชันสั่งจำลองการคลิกเปลี่ยนรูปภาพ
     function triggerImageChange(index) {
         const targetThumb = thumbContainer.querySelector(`.thumb-img[data-index="${index}"]`);
         if (targetThumb) {
-            targetThumb.click(); // ลิงค์ไปหาฟังก์ชันเปลี่ยนรูปภาพเดิมอัตโนมัติ
+            targetThumb.click();
         }
     }
-    // 🚀 เพิ่มฟังก์ชันดักจับปุ่มลูกศร ซ้าย-ขวา บนคีย์บอร์ดเพื่อเปลี่ยนรูปภาพ
+
+    // 🚀 ระบบลูกศร ซ้าย-ขวา บนคีย์บอร์ดคอมพิวเตอร์
     const handleKeyDown = function(e) {
-        // เช็คก่อนว่าหน้าต่างรายละเอียดยังเปิดอยู่ไหม ถ้าถูกปิดไปแล้วให้ทำลาย Event ตัวเองทิ้ง
         const modal = document.getElementById('productDetailModal');
         if (!modal || !modal.classList.contains('active')) {
             window.removeEventListener('keydown', handleKeyDown);
             return;
         }
 
-        // ดักจับปุ่ม ArrowLeft (ลูกศรซ้าย) และ ArrowRight (ลูกศรขวา)
         if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-            e.preventDefault(); // ป้องกันไม่ให้หน้าเว็บเลื่อนขึ้นลงเวลาสไลด์รูป
-            
-            // หาตำแหน่งรูปปัจจุบันจากรูปย่อยที่ติดคลาส active อยู่
+            e.preventDefault();
             const activeThumb = thumbContainer.querySelector('.thumb-img.active');
             if (!activeThumb) return;
             
@@ -675,14 +674,11 @@ function openProductDetailPopup(id) {
             let nextIndex = currentIndex;
 
             if (e.key === 'ArrowLeft') {
-                // กดย้อนกลับ (ถ้ารูปแรกสุด ให้วนไปรูปสุดท้าย)
-                nextIndex = (currentIndex - 1 + lightboxImagesArray.length) % lightboxImagesArray.length;
+                nextIndex = (currentIndex - 1 + localImagesArray.length) % localImagesArray.length;
             } else if (e.key === 'ArrowRight') {
-                // กดไปข้างหน้า (ถ้ารูปสุดท้าย ให้วนกลับมารูปแรก)
-                nextIndex = (currentIndex + 1) % lightboxImagesArray.length;
+                nextIndex = (currentIndex + 1) % localImagesArray.length;
             }
 
-            // ค้นหา Element รูปย่อยตัวถัดไปแล้วสั่งจำลองการคลิก (Trigger Click) เพื่อเปลี่ยนรูป
             const targetThumb = thumbContainer.querySelector(`.thumb-img[data-index="${nextIndex}"]`);
             if (targetThumb) {
                 targetThumb.click();
@@ -690,7 +686,6 @@ function openProductDetailPopup(id) {
         }
     };
 
-    // ลงทะเบียนฟังคำสั่งกดคีย์บอร์ดบนหน้าต่าง window
     window.addEventListener('keydown', handleKeyDown);
 }
 
@@ -702,66 +697,6 @@ document.getElementById('lightboxNext').onclick = () => {
     currentLightboxIndex = (currentLightboxIndex + 1) % lightboxImagesArray.length;
     document.getElementById('lightboxImg').src = lightboxImagesArray[currentLightboxIndex];
 };
-// 🚀 เพิ่มระบบดักจับคีย์บอร์ด ปุ่มลูกศร ซ้าย-ขวา สำหรับโหมด "ขยายภาพ (Lightbox)"
-window.addEventListener('keydown', (e) => {
-    const lightboxModal = document.getElementById('lightboxModal');
-    
-    // เช็คก่อนว่าโหมดขยายภาพ (Lightbox) กำลังเปิดใช้งานอยู่จริง ๆ ไหม
-    if (lightboxModal && lightboxModal.classList.contains('active')) {
-        
-        if (e.key === 'ArrowLeft') {
-            e.preventDefault(); // ป้องกันหน้าเว็บเลื่อนแวบไปแวบมา
-            // เปลี่ยนรูปย้อนกลับ
-            currentLightboxIndex = (currentLightboxIndex - 1 + lightboxImagesArray.length) % lightboxImagesArray.length;
-            document.getElementById('lightboxImg').src = lightboxImagesArray[currentLightboxIndex];
-        } 
-        else if (e.key === 'ArrowRight') {
-            e.preventDefault();
-            // เปลี่ยนรูปไปข้างหน้า
-            currentLightboxIndex = (currentLightboxIndex + 1) % lightboxImagesArray.length;
-            document.getElementById('lightboxImg').src = lightboxImagesArray[currentLightboxIndex];
-        }
-    }
-});
-
-// 🚀 เพิ่มระบบปัดหน้าจอ (Swipe) สำหรับมือถือในโหมด "ขยายภาพเต็มจอ (Lightbox)"
-const lightboxImgElement = document.getElementById('lightboxImg');
-if (lightboxImgElement) {
-    let lbTouchStartX = 0;
-    let lbTouchEndX = 0;
-
-    // ดักจับจุดที่เริ่มแตะนิ้วลงบนรูปภาพขยายใหญ่
-    lightboxImgElement.addEventListener('touchstart', function(e) {
-        lbTouchStartX = e.changedTouches[0].screenX;
-    }, { passive: true });
-
-    // ดักจับจุดที่ยกนิ้วขึ้นจากรูปภาพขยายใหญ่
-    lightboxImgElement.addEventListener('touchend', function(e) {
-        lbTouchEndX = e.changedTouches[0].screenX;
-        handleLightboxSwipe();
-    }, { passive: true });
-
-    // ฟังก์ชันคำนวณทิศทางการปัดนิ้วในโหมดขยาย
-    function handleLightboxSwipe() {
-        const lightboxModal = document.getElementById('lightboxModal');
-        
-        // เช็คก่อนว่ากำลังเปิดหน้าต่างขยายภาพอยู่จริงหรือไม่
-        if (lightboxModal && lightboxModal.classList.contains('active')) {
-            const swipeThreshold = 50; // ระยะปัดนิ้วขั้นต่ำ (50px)
-
-            if (lbTouchStartX - lbTouchEndX > swipeThreshold) {
-                // 👈 ปัดนิ้วไปทางซ้าย = ไปข้างหน้า (จำลองการกดปุ่ม 'next')
-                currentLightboxIndex = (currentLightboxIndex + 1) % lightboxImagesArray.length;
-                document.getElementById('lightboxImg').src = lightboxImagesArray[currentLightboxIndex];
-            } 
-            else if (lbTouchEndX - lbTouchStartX > swipeThreshold) {
-                // 👉 ปัดนิ้วไปทางขวา = ย้อนกลับ (จำลองการกดปุ่ม 'prev')
-                currentLightboxIndex = (currentLightboxIndex - 1 + lightboxImagesArray.length) % lightboxImagesArray.length;
-                document.getElementById('lightboxImg').src = lightboxImagesArray[currentLightboxIndex];
-            }
-        }
-    }
-}
 /* ==========================================================================
    SECTION 5: ADMIN SYSTEM CONTROLLERS (ระบบผู้ดูแลความปลอดภัย)
    ========================================================================== */
@@ -914,45 +849,77 @@ function initProductDragAndDrop() {
     let grid = document.getElementById('productsGridContainer');
     if (!grid) return;
     
-    if (!adminLoggedIn) {
-        if (mainSortableInstance) { mainSortableInstance.destroy(); mainSortableInstance = null; }
+    // 1. ตรวจสอบสิทธิ์แอดมินและการฟิลเตอร์หมวดหมู่หลัก (หากไม่ใช่หมวดหมู่ "ทั้งหมด" แนะนำให้ปิดชั่วคราวเพื่อป้องกันลำดับฐานข้อมูลพัง)
+    if (!adminLoggedIn || currentFilterCategory !== "ทั้งหมด") {
+        if (mainSortableInstance) { 
+            mainSortableInstance.destroy(); 
+            mainSortableInstance = null; 
+        }
         return;
     }
     
     let sortSelect = document.getElementById('productSortSelect');
     let currentSortMode = sortSelect ? sortSelect.value : 'default';
     
+    // 2. อนุญาตให้ลากได้เฉพาะโหมดเริ่มต้น (default) หรือโหมดล่าสุด (latest) เท่านั้น
     if (currentSortMode === 'default' || currentSortMode === 'latest') {
-        if (mainSortableInstance) return; 
+        if (mainSortableInstance) return; // ถ้ามี instance ทำงานอยู่แล้ว ไม่สร้างซ้ำ
         
         mainSortableInstance = new Sortable(grid, {
             animation: 150,
-            handle: '.product-img-holder',
-            onEnd: async function () {
-                const batch = writeBatch(db);
-                let currentIdx = 0;
+            handle: '.product-img-holder', // นิ้วจับลากได้เฉพาะบริเวณพื้นที่รูปภาพสินค้า
+            
+            // 🌟 [ชุดคำสั่งสำหรับแก้ปัญหามือถือล็อกรอบสอง] 🌟
+            delay: 150,             // ต้องใช้นิ้วแตะค้างไว้ 0.15 วินาที เพื่อให้ไม่ชนกับการปัดหน้าจอเพื่อเลื่อนดูเว็บปกติ
+            delayOnTouchOnly: true, // หน่วงเวลาเฉพาะบนอุปกรณ์สัมผัส/มือถือ เท่านั้น คอมพิวเตอร์ลากได้ทันที
+            touchStartThreshold: 5, // ถ้านิ้วขยับเกิน 5px ระหว่างแตะค้าง ถือเป็นการเลื่อนหน้าจอปกติ ไม่ใช่การลากสินค้า
+            forceFallback: true,    // 💥 บังคับใช้ Fallback Mode (สำคัญที่สุด) ป้องกันไม่ให้ระบบสัมผัสของเบราว์เซอร์มือถือค้างหลังลากเสร็จ
+            fallbackTolerance: 3,   // ช่วยเพิ่มความไวในการจำลองวัตถุเคลื่อนที่ตามนิ้ว
+            
+            onEnd: async function (evt) {
+                // หากลากแล้ววางตำแหน่งเดิม ไม่ต้องคำนวณใหม่
+                if (evt.oldIndex === evt.newIndex) return;
                 
-                grid.querySelectorAll('.product-card').forEach(card => {
-                    let id = card.getAttribute('data-id');
-                    let docRef = doc(db, "products", id);
-                    batch.update(docRef, { sortOrder: currentIdx });
-                    currentIdx++;
-                });
+                // 3. สลับข้อมูลสินค้าในตัวแปร 'products' ภายในหน่วยความจำตามจริงทันที (แม่นยำกว่าการลูปอ่าน DOM ใหม่บนมือถือ)
+                const movedItem = products.splice(evt.oldIndex, 1)[0];
+                products.splice(evt.newIndex, 0, movedItem);
                 
-                await batch.commit(); // บันทึกลำดับสลับที่ทั้งหมดขึ้น Firebase พร้อมกันในทีเดียว
-                // อัปเดตข้อมูล State ท้องถิ่น
-                let reorderedProducts = [];
-                grid.querySelectorAll('.product-card').forEach(card => {
-                    let id = card.getAttribute('data-id');
-                    let found = products.find(p => p.id === id);
-                    if (found) reorderedProducts.push(found);
-                });
-                products = reorderedProducts;
+                // 4. บันทึกสำรองข้อมูลลำดับล่าสุดเก็บไว้ในเครื่อง
                 saveDataBackup();
+                
+                // 5. เตรียมชุดคำสั่งเพื่อเตรียมอัปเดตขึ้น Firebase Firestore พร้อมกันทั้งหมด
+                const batch = writeBatch(db);
+                products.forEach((prod, index) => {
+                    prod.sortOrder = index; // อัปเดตโครงสร้างลำดับในวัตถุสินค้า
+                    const docRef = doc(db, "products", prod.id);
+                    batch.update(docRef, { sortOrder: index });
+                });
+                
+                try {
+                    // ส่งคำสั่งอัปเดต sortOrder ทั้งแผงขึ้น Cloud
+                    await batch.commit();
+                    console.log("บันทึกลำดับสินค้าใหม่เรียบร้อย!");
+                    
+                    // 🌟 6. รีเซ็ตเคลียร์ Touch Session ล้างอาการหน่วงค้าง เพื่อให้ลากรอบถัดไปได้ทันที
+                    setTimeout(() => {
+                        if (mainSortableInstance) {
+                            mainSortableInstance.destroy();
+                            mainSortableInstance = null;
+                        }
+                        initProductDragAndDrop(); // สั่งรันคำสั่งลากรอบใหม่ให้แสตนบายพร้อมทำงานทันที
+                    }, 50);
+                    
+                } catch (err) {
+                    console.error("เกิดข้อผิดพลาดในการเซ็ตลำดับบน Firebase: ", err);
+                    alert("ไม่สามารถบันทึกลำดับสินค้าได้ กรุณาลองใหม่อีกครั้ง");
+                }
             }
         });
     } else {
-        if (mainSortableInstance) { mainSortableInstance.destroy(); mainSortableInstance = null; }
+        if (mainSortableInstance) { 
+            mainSortableInstance.destroy(); 
+            mainSortableInstance = null; 
+        }
     }
 }
 
@@ -1288,26 +1255,43 @@ window.openBulkKeywordModal = function() {
 };
 
 // 📱 4. ระบบดักจับปุ่ม Back บนมือถือเพื่อปิดทุกๆ Popup แบบสมบูรณ์
-// 2. ดักจับทุกครั้งเมื่อผู้ใช้งานกดปุ่ม "ย้อนกลับ" หรือปัดขอบจอมือถือเพื่อย้อนกลับ
 window.addEventListener('popstate', function(event) {
-    // ตรวจสอบว่ามีหน้าต่าง Modal ใด ๆ กำลังถูกเปิดใช้งานอยู่บนหน้าจอหรือไม่ (เช็คจากคลาส active)
-    const activeModal = document.querySelector('.modal-overlay.active, #bulkKeywordModal.active');
+    // 1. หาหน้าต่างธรรมดาที่กำลังเปิดอยู่ (.active)
+    const activeOverlay = document.querySelector('.modal-overlay.active');
+    
+    // 2. หาหน้าต่างคีย์บอร์ดกลุ่มที่กำลังเปิดอยู่ (.active)
+    const bulkModal = document.getElementById('bulkKeywordModal');
+    const isBulkActive = bulkModal && bulkModal.classList.contains('active');
 
-    if (activeModal) {
-        // [เคสที่ 1] หากตรวจเจอว่ามีหน้าต่างเปิดอยู่ -> สั่งปิดหน้าต่างทั้งหมดทันทีแทนการย้อนกลับของเว็บ
-        closeAllModals();
+    if (activeOverlay || isBulkActive) {
+        // แทนที่จะปิดปูพรมพร้อมกันหมด ให้เช็คปิดตัวที่เปิดอยู่ล่าสุดทีละตัว เพื่อให้ CSS อนิเมชั่นทำงานได้สมบูรณ์
+        if (isBulkActive) {
+            // ถ้าหน้าต่างคีย์บอร์ดกลุ่มเปิดอยู่ ให้จำลองการคลิกปุ่มปิดของมันเองเพื่อความนุ่มนวล
+            const closeBtn = bulkModal.querySelector('.close-modal-btn') || bulkModal.querySelector('button');
+            if (closeBtn) {
+                closeBtn.click();
+            } else {
+                bulkModal.classList.remove('active');
+            }
+        } else if (activeOverlay) {
+            // ถ้าเป็นป๊อปอัปทั่วไป ให้หาปุ่มปิด (กากบาท) ด้านในป๊อปอัปนั้นแล้วสั่ง Click() 
+            const closeBtn = activeOverlay.querySelector('.close-modal-btn') || activeOverlay.querySelector('.close-btn');
+            if (closeBtn) {
+                closeBtn.click(); // ลื่นไหลแน่นอนเพราะใช้ Logic ปิดเดิมของระบบ
+            } else {
+                activeOverlay.classList.remove('active');
+            }
+        }
         
-        // ดันประวัติ State หน้าปัจจุบันกลับไว้ที่เดิมเพื่อให้สามารถกด Back สเต็ปต่อไปได้ปกติ
+        // ดันสถานะประวัติหน้าเว็บให้อยู่กับที่ ไม่ให้เว็บย้อนถอยหลังข้ามหน้า
         history.pushState({ page: "home", category: currentFilterCategory }, "");
     } 
     else if (currentFilterCategory !== "ทั้งหมด") {
-        // [เคสที่ 2] ไม่มีหน้าต่างเปิดอยู่ แต่หน้าเว็บเลือกฟิลเตอร์หมวดหมู่อื่นอยู่ -> ย้อนกลับมาที่หมวดหมู่ "ทั้งหมด"
         currentFilterCategory = "ทั้งหมด";
         if (typeof renderSidebar === 'function') renderSidebar();
         if (typeof renderProducts === 'function') renderProducts();
         history.replaceState({ page: "home", category: "ทั้งหมด" }, "");
     }
-    // [เคสที่ 3] หากอยู่หน้าแรกปกติและไม่มีป๊อปอัป การกด Back อีกครั้งจะออกจากเว็บตามสไตล์ปกติของมือถือ
 });
 
 // 5. ปรับปรุงแถบเมนูด้านข้างเพื่อเก็บบันทึกประวัติสเตทเวลาเปลี่ยนประเภทสินค้า
