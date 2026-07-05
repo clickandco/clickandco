@@ -208,28 +208,47 @@ async function initializeDefaultProducts() {
     await loadProducts();
 }
 
-// ฟังก์ชันดึงข้อมูลสถิติ
-async function loadStats() {
-    let todayKey = getTodayKey();
+async function loadStats(selectedDate) {
+    const statsDocRef = doc(db, "stats", selectedDate);
     try {
-        const docRef = doc(db, "stats", todayKey);
-        const docSnap = await getDocs(query(statsCollection));
+        const docSnap = await getDoc(statsDocRef);
+        const dayClicks = docSnap.exists() && docSnap.data().clicks ? docSnap.data().clicks : {};
+
+        document.getElementById('statViews').innerText = docSnap.exists() ? (docSnap.data().views || 0) : 0;
         
-        // ดึงสถิติต่างๆ ลงมาเก็บใน Local state
-        docSnap.forEach(d => {
-            stats[d.id] = d.data();
+        const totalClicks = Object.values(dayClicks).reduce((a, b) => a + b, 0);
+        document.getElementById('statClicks').innerText = totalClicks;
+
+        const tbody = document.getElementById('statsProductList');
+        
+        // 🔥 1. ล้างตารางเก่าออกให้หมด เพื่อลบกลไกที่ล็อกลำดับแถวไว้ใน index.html
+        tbody.innerHTML = "";
+
+        // 🔥 2. นำสินค้ามาจับคู่กับยอดคลิกวันนั้นๆ
+        const sortedProducts = products.map(product => {
+            return {
+                ...product,
+                clickCount: Number(dayClicks[product.id] || 0) // แปลงเป็น Number เพื่อให้เปรียบเทียบค่าได้แม่นยำ
+            };
         });
 
-        if (!stats[todayKey]) {
-            stats[todayKey] = { views: 0, clicks: {} };
-        }
-        
-        // เพิ่มยอด View ทันทีเมื่อเข้าเว็บ (เพิ่มทั้งบน Cloud และ Local)
-        stats[todayKey].views = (stats[todayKey].views || 0) + 1;
-        await setDoc(doc(db, "stats", todayKey), stats[todayKey], { merge: true });
-        localStorage.setItem('6ickboy_stats', JSON.stringify(stats));
-    } catch (e) {
-        console.error("Error loading stats: ", e);
+        // 🔥 3. สั่งเรียงลำดับจาก ยอดคลิกมาก ไปหา ยอดคลิกน้อย
+        sortedProducts.sort((a, b) => b.clickCount - a.clickCount);
+
+        // 🔥 4. วนลูปสร้างแถวตาราง (tr) ใหม่เข้าไปตามลำดับยอดคลิกจริงๆ
+        sortedProducts.forEach((product) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${product.name}</td>
+                <td style="text-align: right; font-weight: bold; color: #00ff87;">
+                    ${product.clickCount.toLocaleString()} ครั้ง
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+    } catch (err) {
+        console.error("Load Stats Error: ", err);
     }
 }
 
@@ -1315,12 +1334,24 @@ function updateStatsUI() {
     const tbody = document.getElementById('statsTableBody');
     if (tbody) {
         tbody.innerHTML = "";
-        products.forEach(p => {
-            let clickCount = dayStats.clicks[p.id] || 0;
+
+        // 1. นำรายชื่อสินค้ามาผูกรวมกับยอดคลิกของวันนั้น ๆ ก่อน
+        const sortedProducts = products.map(p => {
+            return {
+                ...p,
+                clickCount: (dayStats && dayStats.clicks && dayStats.clicks[p.id]) ? Number(dayStats.clicks[p.id]) : 0
+            };
+        });
+
+        // 2. จัดเรียงลำดับจากสินค้าที่มียอดคลิกมากที่สุด (b) ไปหาน้อยที่สุด (a)
+        sortedProducts.sort((a, b) => b.clickCount - a.clickCount);
+
+        // 3. วนลูปแสดงผลจาก Array ใหม่ที่ผ่านการเรียงลำดับเรียบร้อยแล้ว
+        sortedProducts.forEach(p => {
             tbody.innerHTML += `
                 <tr>
                     <td>${p.isMall ? '[MALL] ' : ''}${p.name}</td>
-                    <td style="text-align:center; font-weight:bold; color:#2ecc71;">${clickCount} ครั้ง</td>
+                    <td style="text-align:center; font-weight:bold; color:#2ecc71;">${p.clickCount} ครั้ง</td>
                 </tr>`;
         });
     }
@@ -1741,13 +1772,13 @@ document.addEventListener('DOMContentLoaded', () => {
 // นำเข้าฟังก์ชันดึงข้อมูลแบบ Real-time เพิ่มเติมที่บรรทัดบนสุดของไฟล์ (ถ้าระบบยังไม่มี)
 import { onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// --- 👑 ฟังก์ชันฟังข้อมูลการสมัครสมาชิกค้างรอการอนุมัติ (Real-time Listener) ---
+// --- 👑 ฟังก์ชันฟังข้อมูลการสมัครสมาชิกค้างรอการอนุมัติ (Real-time Listener + Auto Popup) ---
 function listenPendingUsers() {
     const checkUserCollection = collection(db, "checkuser");
     
     onSnapshot(checkUserCollection, (snapshot) => {
-        const countSpan = document.getElementById('pendingUserCount'); // สัญลักษณ์ตัวเลขเตือน (ถ้ามี)
-        const container = document.getElementById('pendingUsersContainer'); // กล่องรับรายชื่อใน index.html
+        const countSpan = document.getElementById('pendingUserCount'); // สัญลักษณ์ตัวเลขเตือน
+        const container = document.getElementById('pendingUsersContainer'); // กล่องรับรายชื่อ
         const count = snapshot.size;
 
         if (countSpan) {
@@ -1759,9 +1790,23 @@ function listenPendingUsers() {
             }
         }
 
+        // 🚀 [🔥 จุดอัปเดตสำคัญ] ถ้าตรวจเจอตัวเลขผู้สมัครค้างอนุมัติ (count > 0) ให้เด้งหน้าจอตรวจสอบขึ้นมาทันที!
+        if (count > 0) {
+            // เช็คว่าแอดมินล็อกอินอยู่หรือไม่ (ถ้าควบคุมด้วยสิทธิ์เปิด-ปิดคลาส หรือเช็ค adminLoggedIn)
+            if (adminLoggedIn || document.body.classList.contains('admin-mode-active')) {
+                const approveModal = document.getElementById('userApproveModal');
+                // สั่งเด้งเปิดทันทีถ้าป๊อปอัปยังไม่ได้ถูกเปิดอยู่
+                if (approveModal && !approveModal.classList.contains('active')) {
+                    openModal('userApproveModal');
+                }
+            }
+        }
+
         if (container) {
             if (count === 0) {
                 container.innerHTML = `<div style="text-align:center; color:#aaa; padding:20px;">ไม่มีข้อมูลผู้สมัครที่รอการอนุมัติ</div>`;
+                // ถ้าจัดการอนุมัติจนหมดแล้ว ให้ปิดหน้าต่างอัตโนมัติ (เลือกเปิดซ่อนบรรทัดนี้ได้หากต้องการให้ปิดเอง)
+                // closeModal('userApproveModal'); 
                 return;
             }
 
@@ -1794,7 +1839,6 @@ function addApproveEvents() {
     // ปุ่มอนุมัติ
     document.querySelectorAll('.btn-approve').forEach(btn => {
         btn.addEventListener('click', async (e) => {
-            // ใช้ currentTarget เพื่อล็อกตำแหน่ง Attribute ไว้ที่แท็ก button เสมอ แม้แอดมินคลิกโดนช่องว่างในปุ่ม
             const username = e.currentTarget.getAttribute('data-user');
             const password = e.currentTarget.getAttribute('data-pass');
             const facebook = e.currentTarget.getAttribute('data-fb');
@@ -1802,7 +1846,6 @@ function addApproveEvents() {
             const phone = e.currentTarget.getAttribute('data-phone');
 
             try {
-                // 1. เขียนข้อมูลผู้ใช้ชุดนี้ไปที่ database หลัก "market_users" เพื่อให้ใช้ล็อกอินได้ทันที
                 await setDoc(doc(db, "market_users", username), {
                     username: username,
                     password: password,
@@ -1811,10 +1854,9 @@ function addApproveEvents() {
                     phone: phone || "ไม่ได้ระบุ",
                     role: "user",
                     status: "approved",
-                    approvedAt: new Date().getTime() // เปลี่ยนเป็น timestamp เพื่อให้ดึงไปเรียงลำดับเวลาได้ง่าย
+                    approvedAt: new Date().getTime()
                 });
 
-                // 2. ลบชื่อออกจากคอลเลกชันพักข้อมูล "checkuser"
                 await deleteDoc(doc(db, "checkuser", username));
                 alert(`🎯 อนุมัติผู้ใช้งาน บัญชี: ${username} เรียบร้อยแล้ว!`);
 
@@ -1832,7 +1874,6 @@ function addApproveEvents() {
 
             if (confirm(`คุณแน่ใจหรือไม่ที่จะปฏิเสธและลบคำขอของ "${username}"?`)) {
                 try {
-                    // ลบออกจาก checkuser ทันที
                     await deleteDoc(doc(db, "checkuser", username));
                     alert("🗑️ ลบข้อมูลคำขอสมัครเรียบร้อยแล้ว");
                 } catch (err) {
@@ -1844,22 +1885,113 @@ function addApproveEvents() {
     });
 }
 
-// --- 🧭 ระบบสลับควบคุมเปิด/ปิดป๊อปอัปแอดมิน (แก้ไข ID ให้ตรงกับ index.html) ---
+// --- 🧭 ระบบสลับควบคุมเปิด/ปิดป๊อปอัปแอดมิน ---
 document.addEventListener("DOMContentLoaded", () => {
-    // แก้ไขเป็น ID "userApproveModal" ตามที่มีอยู่ใน index.html ของคุณ
     const approveModal = document.getElementById('userApproveModal'); 
     
-    // คลิกเปิดเมนูอนุมัติสมาชิก (อ้างอิง ID ปุ่มจริงในเมนูแอดมินของคุณ)
     document.getElementById('btnOpenUserApproveModal')?.addEventListener('click', (e) => {
         e.preventDefault();
-        openModal('userApproveModal'); //  เรียกใช้ฟังก์ชันหลักของระบบ เพื่อเพิ่มคลาส .active
+        openModal('userApproveModal');
     });
 
-    // คลิกปุ่มกากบาทเพื่อปิด Popup
     document.getElementById('btnCloseApproveModal')?.addEventListener('click', () => {
-        closeModal('userApproveModal'); //  เรียกใช้ฟังก์ชันหลักของระบบ เพื่อถอดคลาส .active ออก
+        closeModal('userApproveModal');
     });
 
-    // เริ่มทำงานระบบ Real-time ดึงคนสมัครสมาชิกค้างรอตรวจ (0)
+    // เริ่มทำงานระบบ Real-time ดึงคนสมัครสมาชิกค้างรอตรวจ
     listenPendingUsers();
 });
+
+// ==========================================================================
+// SECTION 13: 📊 ระบบบันทึกสถิติ ยอดเข้าชม และยอดคลิกสินค้า ลง Database (Firestore) เพื่อดูย้อนหลัง
+// ==========================================================================
+
+// ฟังก์ชันตัวช่วยสำหรับสร้าง Key วันที่ในรูปแบบ YYYY-MM-DD (เช่น 2026-07-06)
+function getTodayDateString() {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+// 👁️ 1. ฟังก์ชันนับยอดเข้าชมหน้าเว็บ (+1 Views อัตโนมัติเมื่อมีคนเปิดเว็บ)
+async function trackPageLoadView() {
+    const todayStr = getTodayDateString();
+    const statsDocRef = doc(db, "stats", todayStr);
+    
+    try {
+        const docSnap = await getDoc(statsDocRef);
+        let currentViews = 0;
+        
+        if (docSnap.exists()) {
+            currentViews = docSnap.data().views || 0;
+        }
+        
+        // บันทึกแบบ merge: true เพื่อไม่ให้ไปทับข้อมูลสถิติอื่น ๆ ของวันนั้น
+        await setDoc(statsDocRef, { views: currentViews + 1 }, { merge: true });
+    } catch (err) {
+        console.error("Error tracking view: ", err);
+    }
+}
+
+// 🛒 2. ฟังก์ชันบันทึกยอดคลิกแยกตามรายสินค้า (+1 Clicks)
+async function trackProductClick(productId) {
+    const todayStr = getTodayDateString();
+    const statsDocRef = doc(db, "stats", todayStr);
+    
+    try {
+        const docSnap = await getDoc(statsDocRef);
+        let currentClicks = {};
+        
+        if (docSnap.exists() && docSnap.data().clicks) {
+            currentClicks = docSnap.data().clicks;
+        }
+        
+        // เพิ่มยอดคลิกของสินค้านั้นขึ้นทีละ 1
+        currentClicks[productId] = Number(currentClicks[productId] || 0) + 1;
+        
+        await setDoc(statsDocRef, { clicks: currentClicks }, { merge: true });
+    } catch (err) {
+        console.error("Error tracking click: ", err);
+    }
+}
+
+// 🔌 3. ตัวเปิดระบบ (Event Listeners) ตรวจจับการทำงานต่าง ๆ บนหน้าเว็บ
+document.addEventListener("DOMContentLoaded", async () => {
+    // ก) แทร็กกิ้งยอดเข้าชมทันทีที่มีคนโหลดหน้าเว็บสำเร็จ
+    await trackPageLoadView();
+
+    // ข) เปิดระบบสลับดูสถิติย้อนหลังเมื่อเลือกวันที่บนปฏิทิน (อ้างอิง ID จากระบบสถิติ)
+    const datePicker = document.getElementById('statDatePicker');
+    if (datePicker) {
+        // ตั้งค่าเริ่มต้นให้ตัวเลือกวันที่ แสดงเป็น "วันนี้" เสมอเมื่อเปิดหน้าแอดมิน
+        datePicker.value = getTodayDateString();
+        
+        datePicker.addEventListener('change', async (e) => {
+            if (typeof loadStats === "function") {
+                await loadStats(e.target.value); // ดึงข้อมูลสถิติของวันที่ถูกเลือกมาแสดงผลย้อนหลัง
+            }
+        });
+    }
+});
+
+// ค) ตรวจจับยอดคลิกเมื่อลูกค้ากดปุ่มสั่งซื้อสินค้า (อ้างอิง class จากปุ่มในแอปของคุณ)
+document.addEventListener('click', async (e) => {
+    // ปรับแก้ชื่อ Class ปุ่มตรงนี้ให้ตรงกับหน้าแอปจริงของคุณ เช่น ปุ่มลิ้งค์สั่งซื้อสินค้า
+    const orderBtn = e.target.closest('.order-click-track') || e.target.closest('[data-id]');
+    if (orderBtn) {
+        const productId = orderBtn.getAttribute('data-id');
+        // ตรวจสอบชัวร์ว่าเป็นปุ่มสินค้า (ไม่ใช่ปุ่มแอดมินอื่น ๆ) และมีไอดีสินค้าอยู่จริง
+        if (productId && !orderBtn.id.includes('Btn') && !orderBtn.id.includes('modal')) {
+            await trackProductClick(productId);
+            
+            // หากเป็นการกดบนหน้าจอแอดมิน ให้รีโหลดสถิติทันทีเพื่อความเป็น Real-time
+            const datePicker = document.getElementById('statDatePicker');
+            if (datePicker && typeof loadStats === "function") {
+                await loadStats(datePicker.value);
+            }
+        }
+    }
+});
+
