@@ -6,12 +6,10 @@
     <title>Click&Co</title>
     <link rel="icon" type="image/png" href="https://i.postimg.cc/506FpF6s/2.png">
     
-    <!-- 🌟 เพิ่มส่วนของ Open Graph / Facebook Link Preview ตรงนี้ครับ -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://clickandco.vercel.app/">
     <meta property="og:title" content="Click&Co | รวมสินค้า Gaming Gear">
     <meta property="og:description" content="เว็บรวมคีย์บอร์ด & เมาส์ และอุปกรณ์เกมมิ่งเกียร์ชั้นนำ">
-    <!-- ใส่ URL รูปภาพ Logo สำหรับแสดงตอนพรีวิวลิงก์ที่บรรทัดด้านล่างนี้ (แนะนำรูปขนาด 1200x630px) -->
     <meta property="og:image" content="https://i.postimg.cc/x11xdCcp/738927251-122129365665179775-5062150391536240426-n.jpg">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -42,7 +40,7 @@
                     <h3>หมวดหมู่สินค้า</h3>
                 </div>
                 <ul class="category-list" id="categoryListContainer">
-                    </ul>
+                </ul>
             </aside>
 
             <main class="content-area">
@@ -65,7 +63,7 @@
 
                 <section class="products-section">
                     <div class="products-grid" id="productsGridContainer">
-                        </div>
+                    </div>
 
                     <footer class="site-footer">
                         <div class="footer-content">
@@ -80,7 +78,8 @@
     </div>
 
     <div class="modal-overlay" id="sideMenuModal">
-        <button class="close-modal-btn">&times;</button> <div class="glass-modal drawer-modal">
+        <button class="close-modal-btn">&times;</button> 
+        <div class="glass-modal drawer-modal">
             <div class="drawer-content">
                 <div class="user-status-box" id="adminStatusBox">
                     <i class="fa-solid fa-circle-user"></i>
@@ -88,28 +87,62 @@
                 </div>
                 <ul class="drawer-menu-links">
                     <li><a href="#" id="loginMenuBtn"><i class="fa-solid fa-right-to-bracket"></i> เข้าสู่ระบบผู้ดูแล</a></li>
+                    <li><a href="market.html"><i class="fa-solid fa-store" style="color: #00e676;"></i> Market (สินค้าจากทางบ้าน)</a></li>
                     <li class="admin-only"><a href="#" id="adminAddProductBtn"><i class="fa-solid fa-plus"></i> เพิ่มสินค้า</a></li>
                     <li class="admin-only"><a href="#" id="adminManageCatBtn"><i class="fa-solid fa-folder-tree"></i> จัดการหมวดหมู่</a></li>
                     <li class="admin-only"><a href="#" id="adminManageDiscountBtn"><i class="fa-solid fa-tags"></i> แก้ไขโค้ดส่วนลดทั้งหมด</a></li>
                     <li class="admin-only"><a href="#" id="adminStatsBtn"><i class="fa-solid fa-chart-line"></i> ระบบสถิติ</a></li>
                     <li class="admin-only"><a href="#" id="adminManageKeywordsBtn"><i class="fa-solid fa-gear"></i> จัดการ Keyword สินค้า</a></li>
+
+                    <li class="admin-only">
+                        <a href="#" id="btnOpenUserApproveModal" style="color: #ff9800 !important; display: flex !important; align-items: center; gap: 6px;">
+                            <i class="fa-solid fa-user-check"></i> อนุมัติสมาชิก 
+                            <span id="pendingUserCount" style="background: #ff9800; color: white; border-radius: 50%; padding: 2px 8px; font-size: 0.75rem; font-weight: bold; display: none;">0</span>
+                        </a>
+                    </li>
                     <li class="admin-only"><a href="#" id="adminLogoutBtn" class="logout-link"><i class="fa-solid fa-right-from-bracket"></i> ออกจากระบบ</a></li>
                 </ul>
             </div>
         </div>
     </div>
 
+    <div class="modal-overlay" id="userApproveModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 99999; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+        <div class="glass-modal" style="background: #ffffff; padding: 25px; border-radius: 16px; width: 90%; max-width: 550px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.2); animation: modalFadeIn 0.3s ease;">
+            
+            <button class="close-modal-btn" id="btnCloseApproveModal" style="position: absolute; top: 15px; right: 15px; background: #f0f2f5; border: none; font-size: 1.4rem; cursor: pointer; color: #57606a; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">&times;</button>
+            
+            <div id="approveUsersListView">
+                <h3 style="margin-bottom: 5px; font-size: 1.3rem; font-weight: 600; color: #24292f; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-users-gear" style="color: #ff9800;"></i> รายชื่อผู้สมัครที่รอการอนุมัติ
+                </h3>
+                <p style="font-size: 0.85rem; color: #57606a; margin-bottom: 15px; margin-top: 0;">กรุณาตรวจสอบข้อมูลก่อนกดยืนยันสิทธิ์เข้าระบบ</p>
+                
+                <div id="pendingUsersContainer" style="display: flex; flex-direction: column; gap: 12px; max-height: 400px; overflow-y: auto; padding-right: 5px;">
+                </div>
+            </div>
+
+            <div id="userDetailView" style="display: none;">
+                <button id="btnBackToUserList" style="background: none; border: none; color: #57606a; cursor: pointer; margin-bottom: 15px; font-weight: 500; display: flex; align-items: center; gap: 5px;"><i class="fa-solid fa-arrow-left"></i> ย้อนกลับ</button>
+                <h3 style="margin-bottom: 15px; font-size: 1.25rem; font-weight: 600; color: #24292f;"><i class="fa-solid fa-address-card"></i> ข้อมูลผู้สมัครโดยละเอียด</h3>
+                <div id="userDetailContent" style="background: #f8f9fa; padding: 15px; border-radius: 8px; font-size: 0.95rem; color: #24292f;">
+                </div>
+            </div>
+
+        </div>
+    </div>
+
     <div class="modal-overlay" id="loginModal">
-        <button class="close-modal-btn">&times;</button> <div class="glass-modal central-modal animate-popup">
+        <button class="close-modal-btn">&times;</button> 
+        <div class="glass-modal central-modal animate-popup">
             <h3>เข้าสู่ระบบผู้ดูแล</h3>
             <form id="loginForm" class="modal-form">
                 <div class="form-group">
                     <label>Username</label>
-                    <input type="text" id="loginUser"  autocomplete="off">
+                    <input type="text" id="loginUser" autocomplete="off">
                 </div>
                 <div class="form-group">
                     <label>Password</label>
-                    <input type="password" id="loginPass" >
+                    <input type="password" id="loginPass">
                 </div>
                 <button type="submit" class="submit-btn">ยืนยันเข้าสู่ระบบ</button>
             </form>
@@ -117,7 +150,8 @@
     </div>
 
     <div class="modal-overlay" id="subCatPopup">
-        <button class="close-modal-btn">&times;</button> <div class="glass-modal central-modal animate-popup">
+        <button class="close-modal-btn">&times;</button> 
+        <div class="glass-modal central-modal animate-popup">
             <h3 id="subCatTitle">เลือกหมวดหมู่ย่อย</h3>
             
             <div class="cat-section-title">หมวดหมู่ย่อย</div>
@@ -131,7 +165,8 @@
     </div>
 
     <div class="modal-overlay" id="productDetailModal">
-        <button class="close-modal-btn">&times;</button> <div class="glass-modal central-modal detail-modal animate-popup">
+        <button class="close-modal-btn">&times;</button> 
+        <div class="glass-modal central-modal detail-modal animate-popup">
             <div class="detail-grid">
                 <div class="detail-gallery">
                     <div class="main-preview-box">
@@ -170,15 +205,12 @@
     </div>
 
     <div class="modal-overlay" id="productFormModal">
-        <button class="close-modal-btn">&times;</button> <div class="glass-modal central-modal form-modal animate-popup">
+        <button class="close-modal-btn">&times;</button> 
+        <div class="glass-modal central-modal form-modal animate-popup">
             <h3 id="productFormTitle">เพิ่มสินค้าใหม่</h3>
             <form id="productForm" class="modal-form scrollable-form">
                 <input type="hidden" id="editProductId">
                 
-                <div class="form-group">
-                    <label>ชื่อสินค้า</label>
-                    <input type="text" id="formProdName" >
-                </div>
                 <div class="form-group checkbox-row">
                     <label><input type="checkbox" id="formMall"> ร้าน MALL</label>
                     <label><input type="checkbox" id="formComingSoon"> Coming Soon...</label>
@@ -186,21 +218,25 @@
                     <label><input type="checkbox" id="formHot"> สินค้าขายดี (HOT)</label>
                 </div>
                 <div class="form-group">
+                    <label>ชื่อสินค้า</label>
+                    <input type="text" id="formProdName">
+                </div>
+                <div class="form-group">
                     <label>รูปแสดงหน้าเว็บ (1 รูป URL)</label>
-                    <input type="url" id="formMainImg" >
+                    <input type="url" id="formMainImg">
                 </div>
                 
                 <div class="form-group url-gallery-group">
                     <label>รูปสินค้าเพิ่มเติมใน Popup (สูงสุด 8 รูป URL)</label>
                     <div id="formThumbUrlsContainer">
-                        </div>
+                    </div>
                     <small style="color:#666; display:block; margin-top:5px;">*ในโหมดผู้ดูแลหลังจากเซฟ สามารถลากสลับตำแหน่งภาพย่อยในหน้าดีเทลได้</small>
                 </div>
 
                 <div class="form-row-2">
                     <div class="form-group">
                         <label>ราคาปกติ (บาท)</label>
-                        <input type="number" id="formNormalPrice" >
+                        <input type="number" id="formNormalPrice">
                     </div>
                     <div class="form-group">
                         <label>ส่วนลด (เช่น 25%=2000)</label>
@@ -210,7 +246,7 @@
 
                 <div class="form-group">
                     <label>รายละเอียดสินค้า</label>
-                    <textarea id="formProdDesc" rows="3" ></textarea>
+                    <textarea id="formProdDesc" rows="3"></textarea>
                 </div>
                 <div class="form-group">
                     <label>Keywords (คั่นด้วยคอมมา , สำหรับการค้นหา)</label>
@@ -220,21 +256,21 @@
                 <div class="form-row-3">
                     <div class="form-group">
                         <label>หมวดหมู่หลัก</label>
-                        <select id="formMainCat" ></select>
+                        <select id="formMainCat"></select>
                     </div>
                     <div class="form-group">
                         <label>หมวดหมู่ย่อย</label>
-                        <select id="formSubCat" ></select>
+                        <select id="formSubCat"></select>
                     </div>
                     <div class="form-group">
                         <label>แบรนด์</label>
-                        <select id="formBrand" ></select>
+                        <select id="formBrand"></select>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label>ลิงก์ปุ่มสั่งซื้อสินค้า</label>
-                    <input type="url" id="formOrderLink" >
+                    <input type="url" id="formOrderLink">
                 </div>
 
                 <div class="form-actions">
@@ -246,7 +282,8 @@
     </div>
 
     <div class="modal-overlay" id="categoryManageModal">
-        <button class="close-modal-btn">&times;</button> <div class="glass-modal central-modal cat-manage-modal animate-popup">
+        <button class="close-modal-btn">&times;</button> 
+        <div class="glass-modal central-modal cat-manage-modal animate-popup">
             <h3>จัดการหมวดหมู่สินค้า</h3>
             
             <div class="add-cat-box">
@@ -280,7 +317,8 @@
     </div>
 
     <div class="modal-overlay" id="bulkDiscountModal">
-        <button class="close-modal-btn">&times;</button> <div class="glass-modal central-modal bulk-modal animate-popup">
+        <button class="close-modal-btn">&times;</button> 
+        <div class="glass-modal central-modal bulk-modal animate-popup">
             <h3>แก้ไขโค้ดส่วนลด & ราคา ทั้งหมด</h3>
             
             <div class="bulk-filter-bar">
@@ -308,14 +346,15 @@
                         </tr>
                     </thead>
                     <tbody id="bulkProductTableBody">
-                        </tbody>
+                    </tbody>
                 </table>
             </div>
         </div>
     </div>
 
     <div id="statsModal" class="modal-overlay">
-        <button class="close-modal-btn" onclick="closeModal('statsModal')">&times;</button> <div class="glass-modal central-modal animate-popup" style="max-width: 600px;">
+        <button class="close-modal-btn" onclick="closeModal('statsModal')">&times;</button> 
+        <div class="glass-modal central-modal animate-popup" style="max-width: 600px;">
             
             <h3 style="font-size: 1.4rem; margin-bottom: 20px; color: #2c3e50; font-weight: 600;">
                 <i class="fa-solid fa-chart-line" style="margin-right: 8px; color: #3498db;"></i>สถิติร้านค้า
@@ -357,14 +396,15 @@
                         </tr>
                     </thead>
                     <tbody id="statsTableBody">
-                        </tbody>
+                    </tbody>
                 </table>
             </div>
         </div>
     </div>
 
     <div class="modal-overlay" id="bulkKeywordModal">
-        <button class="close-modal-btn">&times;</button> <div class="glass-modal central-modal animate-popup" style="max-width: 900px; width: 95%; max-height: 85vh; display: flex; flex-direction: column; padding: 25px;">
+        <button class="close-modal-btn">&times;</button> 
+        <div class="glass-modal central-modal animate-popup" style="max-width: 900px; width: 95%; max-height: 85vh; display: flex; flex-direction: column; padding: 25px;">
             
             <h3 style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
                 <i class="fa-solid fa-tags" style="color: var(--accent-color);"></i> จัดการ Keyword สินค้าแบบกลุ่ม
@@ -375,7 +415,7 @@
                     <div style="flex: 1; min-width: 200px;">
                         <label style="font-size: 0.85rem; font-weight: 500; display: block; margin-bottom: 4px;">เลือกหมวดหมู่หลัก > ย่อย</label>
                         <select id="bulkFilterCategorySelect" class="glass-select" style="width: 100%; padding: 8px 12px; font-size: 0.9rem;">
-                            </select>
+                        </select>
                     </div>
                     <div style="flex: 1.5; min-width: 280px;">
                         <label style="font-size: 0.85rem; font-weight: 500; display: block; margin-bottom: 4px;">แก้ไข Keyword พร้อมกัน (ชิ้นที่เลือก Checkbox)</label>
@@ -403,11 +443,22 @@
                         </tr>
                     </thead>
                     <tbody id="bulkKeywordTableBody">
-                        </tbody>
+                    </tbody>
                 </table>
             </div>
         </div>
     </div>
+
+    <style>
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .close-modal-btn:hover {
+            background: #e4e6eb !important;
+            color: #000 !important;
+        }
+    </style>
     <script type="module" src="app.js"></script>
 </body>
 </html>

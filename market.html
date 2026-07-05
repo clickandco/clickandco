@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Market - Click&Co</title>
+    <link rel="icon" type="image/png" href="https://i.postimg.cc/506FpF6s/2.png">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght=300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="market.css">
+</head>
+<body>
+
+    <nav class="market-navbar" style="background: #fff; border-bottom: 1px solid #e1e4e6; padding: 10px 0; position: sticky; top: 0; z-index: 100;">
+        <div class="nav-container" style="display: flex; align-items: center; justify-content: flex-start; width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 15px; box-sizing: border-box; gap: 12px;">
+            
+            <button id="btnOpenMarketSidebar" style="background: #f0f2f5; border: none; font-size: 1.2rem; cursor: pointer; color: #24292f; width: 42px; height: 42px; border-radius: 8px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0;">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <a href="index.html" class="btn-back-home" style="color: #24292f; text-decoration: none; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: #f0f2f5; border-radius: 8px; transition: all 0.2s; font-weight: 500; white-space: nowrap; flex-shrink: 0;">
+                <i class="fa-solid fa-arrow-left"></i> ย้อนกลับ
+            </a>
+            
+            <div class="brand-logo" style="display: flex; align-items: center; flex-shrink: 0;">
+                <a href="index.html" style="display: inline-block; height: 100%;">
+                    <img src="https://i.postimg.cc/kJFN5xmr/1.png" alt="Click&Co" style="height: 38px; width: auto; object-fit: contain; vertical-align: middle;">
+                </a>
+            </div>
+
+            <div style="display: none !important;">
+                <ul class="nav-tabs-left">
+                    <li class="nav-tab-item active" id="tabHome">หน้าแรก Market</li>
+                    <li class="nav-tab-item" id="tabPost">ลงประกาศสินค้า</li>
+                    <li class="nav-tab-item" id="tabManage">จัดการโพสต์ของคุณ</li>
+                    <li class="nav-tab-item" id="tabAdmin" style="display: none !important;">แผงควบคุมผู้ดูแลระบบ</li>
+                </ul>
+                <div class="auth-actions-right" id="userAuthBar">
+                    <button class="btn-user-auth" id="btnOpenLogin">เข้าสู่ระบบ</button>
+                    <button class="btn-user-auth register" id="btnOpenRegister">สมัครสมาชิก</button>
+                    <div class="user-profile-status" id="userInfoDisplay">
+                        <span class="user-role-badge" id="userRoleBadge">-</span>
+                        <div class="user-meta-details">
+                            <strong id="currentUserName">-</strong>
+                            <small id="currentUserFB">-</small>
+                        </div>
+                        <button class="btn-logout-icon" id="btnUserLogout">ออกจากระบบ</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </nav>
+
+    <div class="market-sidebar-overlay" id="marketSidebarOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 9999; backdrop-filter: blur(4px);">
+        <div class="market-sidebar" style="position: absolute; top: 0; left: -300px; width: 280px; height: 100%; background: #f0f2f5; box-shadow: 5px 0 15px rgba(0,0,0,0.1); padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; transition: left 0.3s ease;">
+            
+            <button id="btnCloseMarketSidebar" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #57606a;">&times;</button>
+
+            <div class="sidebar-user-status" style="background: #fff; padding: 15px; border-radius: 12px; margin-top: 25px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; align-items: center; gap: 10px;">
+                <div style="font-size: 2rem; color: #57606a; display: flex; align-items: center;" id="sidebarUserIcon">
+                    <i class="fa-solid fa-circle-user"></i>
+                </div>
+                <div style="display: flex; flex-direction: column; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    <span id="sidebarStatusText" style="font-size: 0.85rem; color: #57606a; font-weight: bold; background: #e1e4e6; padding: 2px 6px; border-radius: 4px; width: fit-content; margin-bottom: 3px;">โหมดผู้เยี่ยมชม</span>
+                    <strong id="sidebarUserName" style="font-size: 1rem; color: #24292f;">ยังไม่ได้เข้าสู่ระบบ</strong>
+                </div>
+            </div>
+
+            <ul class="sidebar-menu-links" style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px;">
+                
+                <li id="sideMenuLoginBtn"><a href="#" style="color: #24292f; background: #fff; border: 1px solid #e1e4e6;"><i class="fa-solid fa-right-to-bracket" style="color: #00e676;"></i> เข้าสู่ระบบสมาชิก</a></li>
+                <li id="sideMenuRegisterBtn"><a href="#" style="color: #24292f; background: #fff; border: 1px solid #e1e4e6;"><i class="fa-solid fa-user-plus" style="color: #2979ff;"></i> สมัครสมาชิกใหม่</a></li>
+                <li id="sideMenuLogoutBtn" style="display: none;"><a href="#" style="color: #fff; background: #d9383a; font-weight: 500;"><i class="fa-solid fa-power-off"></i> ออกจากระบบ</a></li>
+                
+                <hr id="sideMenuDivider" style="border: 0; border-top: 1px solid #e1e4e6; margin: 5px 0;">
+
+                <li><a href="#" class="nav-tab-item active" id="tabHomeSide" onclick="switchMarketTab('tabHome')"><i class="fa-solid fa-shop"></i> หน้าแรก Market</a></li>
+                <li><a href="#" class="nav-tab-item" id="tabPostSide" onclick="switchMarketTab('tabPost')"><i class="fa-solid fa-square-plus"></i> ลงประกาศสินค้า</a></li>
+                <li><a href="#" class="nav-tab-item" id="tabManageSide" onclick="switchMarketTab('tabManage')"><i class="fa-solid fa-list-check"></i> จัดการโพสต์ของคุณ</a></li>
+                <li id="tabAdminSideLi" style="display: none;">
+                    <a href="#" class="nav-tab-item" id="tabAdminSide" onclick="switchMarketTab('tabAdmin')" style="color: #d9383a;">
+                        <i class="fa-solid fa-user-shield"></i> แผงควบคุมแอดมิน
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="container">
+        
+        <section id="sectionHome" class="market-section active">
+            <div class="market-header-title">
+                <h2><i class="fa-solid fa-fire" style="color: #ff5722;"></i> รายการสินค้าทั้งหมดในระบบ</h2>
+                <p>แหล่งรวมโพสต์ขายของจากสมาชิกคุณภาพที่ผ่านการคัดกรองแล้ว</p>
+            </div>
+            
+            <div class="market-sort-container" style="margin-bottom: 15px; display: flex; justify-content: flex-end; align-items: center; gap: 8px;">
+                <label for="marketSortSelect" style="font-size: 0.9rem; color: #57606a;"><i class="fa-solid fa-sort"></i> จัดเรียงตาม:</label>
+                <select id="marketSortSelect" style="padding: 6px 12px; border-radius: 6px; border: 1px solid #e1e4e6; font-size: 0.9rem; cursor: pointer; background: white; font-family: 'Kanit', sans-serif;">
+                    <option value="dynamic">จัดเรียงตามระบบ เริ่มต้น</option>
+                    <option value="price_asc">ราคาจากน้อยไปมาก</option>
+                    <option value="price_desc">ราคาจากมากไปน้อย</option>
+                    <option value="latest">ล่าสุด (ใหม่สุดอยู่บน)</option>
+                </select>
+            </div>
+
+            <div class="market-products-grid" id="marketProductsGrid"></div>
+        </section>
+
+        <section id="sectionPost" class="market-section">
+            <div class="user-post-box" id="userPostSection" style="display: none;">
+                <div class="form-title-header">
+                    <h3><i class="fa-solid fa-pen-to-square"></i> ลงประกาศสินค้าใหม่ของคุณ</h3>
+                    <p>สิทธิ์การโพสต์เฉพาะสมาชิกระดับ Approved หรือ Admin เท่านั้น</p>
+                </div>
+                
+                <form id="marketPostForm" class="market-post-form">
+                    <div class="form-group full-width">
+                        <label for="postTitle">ชื่อสินค้า / รายละเอียดสินค้า</label>
+                        <input type="text" id="postTitle" placeholder="เช่น หูฟังไร้สายสภาพ 99% หรือ รายละเอียดสินค้า..." required>
+                    </div>
+                    <div class="form-group">
+                        <label for="postPrice">ราคาสินค้า (บาท)</label>
+                        <input type="number" id="postPrice" placeholder="เช่น 1500" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="postImgFile">เลือกรูปภาพสินค้า</label>
+                        <input type="file" id="postImgFile" accept="image/*" required style="padding-top: 8px;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="postProvince"><i class="fa-solid fa-map-location-dot"></i> จังหวัดของสินค้า</label>
+                        <input type="text" id="postProvince" placeholder="เช่น กรุงเทพมหานคร, เชียงใหม่" required autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="postDistrict"><i class="fa-solid fa-location-dot"></i> เขต / อำเภอ</label>
+                        <input type="text" id="postDistrict" placeholder="เช่น เขตจตุจักร, เมือง" required autocomplete="off">
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="postLinkUrl">ลิงก์โพสต์ Facebook จริงของคุณ</label>
+                        <input type="url" id="postLinkUrl" placeholder="https://facebook.com/..." required>
+                    </div>
+                    <div class="form-group full-width">
+                        <button type="submit" class="btn-submit-post" id="btnSubmitPostText"><i class="fa-solid fa-cloud-arrow-up"></i> อัปโหลดลงตลาด Market</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="auth-alert-placeholder" id="postAuthNotice">
+                <i class="fa-solid fa-lock"></i>
+                <h4>พื้นที่เฉพาะสมาชิก</h4>
+                <p>กรุณาเข้าสู่ระบบสมาชิกเพื่อดำเนินการลงประกาศขายสินค้าลงหน้าตลาด</p>
+            </div>
+        </section>
+
+        <section id="sectionManage" class="market-section">
+            <div class="market-header-title">
+                <h2><i class="fa-solid fa-user-gear"></i> คลังสินค้าและโพสต์ของคุณ</h2>
+                <p>คุณสามารถตรวจสอบ แก้ไขลิงก์ หรือลบโพสต์ที่เป็นกรรมสิทธิ์ของคุณได้ที่นี่เท่านั้น</p>
+            </div>
+            <div class="market-products-grid" id="myProductsGrid"></div>
+            
+            <div class="auth-alert-placeholder" id="manageAuthNotice">
+                <i class="fa-solid fa-lock"></i>
+                <h4>กรุณาเข้าสู่ระบบ</h4>
+                <p>เพื่อตรวจสอบและแก้ไขข้อมูลโพสต์สินค้าส่วนตัวของคุณ</p>
+            </div>
+        </section>
+
+        <section id="sectionAdmin" class="market-section">
+            <div class="market-header-title">
+                <h2><i class="fa-solid fa-user-shield" style="color: #d9383a;"></i> ระบบจัดการสินค้าทั้งหมดโดยผู้ดูแลระบบ</h2>
+                <p>สิทธิ์สูงสุด: แอดมินสามารถแก้ไขลิงก์ หรือลบโพสต์ของสมาชิกทุกคนในระบบได้เพื่อความปลอดภัย</p>
+            </div>
+            <div class="market-products-grid" id="adminProductsGrid"></div>
+        </section>
+
+    </div>
+
+    <div class="modal-overlay" id="marketAuthModal">
+        <div class="glass-modal animate-popup">
+            <button class="close-modal-btn" id="btnCloseAuthModal">&times;</button>
+            
+            <div id="loginFormSub" class="auth-sub-form">
+                <h3><i class="fa-solid fa-right-to-bracket"></i> เข้าสู่ระบบสมาชิก</h3>
+                
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <button type="button" id="loginTypeUser" style="flex: 1; padding: 8px; border-radius: 6px; border: 2px solid var(--text-main); background: var(--text-main); color: white; font-weight: 500; cursor: pointer;">สมาชิก</button>
+                    <button type="button" id="loginTypeAdmin" style="flex: 1; padding: 8px; border-radius: 6px; border: 2px solid #e1e4e6; background: white; color: var(--text-muted); font-weight: 500; cursor: pointer;">ผู้ดูแลระบบ</button>
+                </div>
+
+                <form id="marketLoginForm" class="modal-style-form">
+                    <div class="modal-form-group">
+                        <label id="emailLabelTitle">Username (บัญชีผู้ใช้งาน)</label>
+                        <input type="text" id="loginEmail" placeholder="กรุณากรอก Username เพื่อเข้าสู่ระบบ " required autocomplete="off">
+                    </div>
+                    <div class="modal-form-group">
+                        <label>รหัสผ่าน</label>
+                        <input type="password" id="loginPassword" placeholder="กรอกรหัสผ่าน" required>
+                    </div>
+                    <button type="submit" class="modal-submit-btn" id="btnLoginSubmit">เข้าสู่ระบบสมาชิก</button>
+                </form>
+                <p class="switch-form-text" id="registerSwitchBox">ยังไม่มีบัญชีสมาชิก? <a href="#" id="linkToRegister">สมัครสมาชิกที่นี่</a></p>
+            </div>
+
+            <div id="registerFormSub" class="auth-sub-form" style="display: none;">
+                <h3><i class="fa-solid fa-user-plus"></i> สมัครสมาชิกร่วมปล่อยของ</h3>
+                
+                <div class="notice-text">
+                    <p><i class="fa-solid fa-triangle-exclamation"></i> บัญชีต้องได้รับการตรวจสอบและอนุมัติจากแอดมินก่อนจึงจะเข้าใช้งานได้</p>
+                    <p style="color: #d9383a; font-weight: 600; margin-top: 4px;"><i class="fa-solid fa-user-shield"></i> เงื่อนไขสำคัญ: โปรไฟล์ Facebook ต้องเป็นโปรไฟล์หลักเท่านั้น!</p>
+                </div>
+
+                <form id="marketRegisterForm" class="modal-style-form">
+                    <div class="modal-form-group">
+                        <label>ชื่อผู้ใช้งาน (Username)</label>
+                        <input type="text" id="regUsername" placeholder="เช่น Somchai_Gear" required autocomplete="off">
+                    </div>
+                    <div class="modal-form-row">
+                        <div class="modal-form-group">
+                            <label>Email</label>
+                            <input type="email" id="regEmail" placeholder="example@mail.com" required autocomplete="off">
+                        </div>
+                        <div class="modal-form-group">
+                            <label>ยืนยัน Email</label>
+                            <input type="email" id="regEmailConfirm" placeholder="กรอกอีเมลอีกครั้ง" required autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="modal-form-row">
+                        <div class="modal-form-group">
+                            <label>Password (6 ตัวขึ้นไป)</label>
+                            <input type="password" id="regPassword" placeholder="ตั้งรหัสผ่าน" required>
+                        </div>
+                        <div class="modal-form-group">
+                            <label>ยืนยัน Password</label>
+                            <input type="password" id="regPasswordConfirm" placeholder="รหัสผ่านอีกครั้ง" required>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-form-row">
+                        <div class="modal-form-group">
+                            <label><i class="fa-solid fa-map-location-dot"></i> จังหวัดที่อยู่</label>
+                            <input type="text" id="regProvince" placeholder="เช่น กรุงเทพมหานคร, เชียงใหม่" required autocomplete="off">
+                        </div>
+                        <div class="modal-form-group">
+                            <label><i class="fa-solid fa-location-dot"></i> เขต / อำเภอ</label>
+                            <input type="text" id="regDistrict" placeholder="เช่น เขตจตุจักร, เมือง" required autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div class="modal-form-group">
+                        <label>ชื่อโปรไฟล์ Facebook (ที่ใช้ติดต่อขายจริง)</label>
+                        <input type="text" id="regFacebook" placeholder="เช่น สมชาย รักดี" required>
+                    </div>
+                    <div class="modal-form-group">
+                        <label>เบอร์ติดต่อ</label>
+                        <input type="tel" id="regPhone" placeholder="เช่น 0987654321" pattern="[0-9]{9,10}" required>
+                    </div>
+                    <button type="submit" class="modal-submit-btn" style="margin-top: 15px;">ส่งคำขอสมัครสมาชิก</button>
+                </form>
+                <p class="switch-form-text">มีบัญชีอยู่แล้ว? <a href="#" id="linkToLogin">กลับไปเข้าสู่ระบบ</a></p>
+            </div>
+        </div>
+    </div>
+    <!-- 📝 หน้าต่าง Popup สำหรับแอดมินแก้ไขข้อมูลสินค้า -->
+    <div id="adminEditModal" class="modal-overlay">
+        <div class="glass-modal animate-popup">
+            <button type="button" id="btnCloseEditModal" class="close-modal-btn">&times;</button>
+            <div class="auth-sub-form">
+                <h3><i class="fa-solid fa-screwdriver-wrench"></i> แก้ไขข้อมูลประกาศสินค้า</h3>
+                <p class="notice-text">โหมดผู้ดูแลระบบ: คุณกำลังแก้ไขข้อมูลโพสต์ของสมาชิก</p>
+                
+                <!-- ค้นหาฟอร์ม #adminEditForm เดิม แล้วปรับตามนี้ -->
+                <form id="adminEditForm" class="modal-style-form">
+                    <input type="hidden" id="editProductId">
+                    <input type="hidden" id="editProductOldImgUrl"> <div class="modal-form-group">
+                        <label>ชื่อสินค้า</label>
+                        <input type="text" id="editProductTitle" required placeholder="ระบุชื่อสินค้าใหม่">
+                    </div>
+                    
+                    <div class="modal-form-group">
+                        <label>ราคา (บาท)</label>
+                        <input type="number" id="editProductPrice" required placeholder="ระบุราคาใหม่">
+                    </div>
+
+                    <div class="modal-form-row" style="display: flex; gap: 10px;">
+                        <div class="modal-form-group" style="flex: 1;">
+                            <label><i class="fa-solid fa-map-location-dot"></i> แก้ไขจังหวัดของสินค้า</label>
+                            <input type="text" id="editProductProvince" placeholder="เช่น กรุงเทพมหานคร" required autocomplete="off">
+                        </div>
+                        <div class="modal-form-group" style="flex: 1;">
+                            <label><i class="fa-solid fa-location-dot"></i> แก้ไขเขต / อำเภอ</label>
+                            <input type="text" id="editProductDistrict" placeholder="เช่น เขตจตุจักร" required autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div class="modal-form-group">
+                        <label>เปลี่ยนรูปภาพสินค้า (ปล่อยว่างไว้หากต้องการใช้รูปเดิม)</label>
+                        <input type="file" id="editProductImgFile" accept="image/*" style="padding: 8px 12px; height: auto;">
+                    </div>
+                    
+                    <div class="modal-form-group">
+                        <label>ลิงก์ปลายทาง (URL)</label>
+                        <input type="url" id="editProductLinkUrl" required placeholder="https://...">
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <button type="button" id="btnCancelEdit" class="modal-submit-btn" style="flex: 1; background: #e1e4e6; color: var(--text-main);">ยกเลิก</button>
+                        <button type="submit" id="btnSubmitEditForm" class="modal-submit-btn" style="flex: 1; background: #d9383a; color: white;">บันทึกข้อมูล</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        const openSidebarBtn = document.getElementById('btnOpenMarketSidebar');
+        const closeSidebarBtn = document.getElementById('btnCloseMarketSidebar');
+        const sidebarOverlay = document.getElementById('marketSidebarOverlay');
+        const sidebarBox = sidebarOverlay.querySelector('.market-sidebar');
+
+        function openSidebar() {
+            sidebarOverlay.style.display = 'block';
+            setTimeout(() => { sidebarBox.style.left = '0px'; }, 10);
+        }
+
+        function closeSidebar() {
+            sidebarBox.style.left = '-300px';
+            setTimeout(() => { sidebarOverlay.style.display = 'none'; }, 300);
+        }
+
+        openSidebarBtn.addEventListener('click', openSidebar);
+        closeSidebarBtn.addEventListener('click', closeSidebar);
+        sidebarOverlay.addEventListener('click', function(e) { if(e.target === sidebarOverlay) closeSidebar(); });
+
+        document.getElementById('sideMenuLoginBtn').addEventListener('click', () => {
+            closeSidebar();
+            document.getElementById('btnOpenLogin').click();
+        });
+        document.getElementById('sideMenuRegisterBtn').addEventListener('click', () => {
+            closeSidebar();
+            document.getElementById('btnOpenRegister').click();
+        });
+        document.getElementById('sideMenuLogoutBtn').addEventListener('click', () => {
+            closeSidebar();
+            document.getElementById('btnUserLogout').click();
+        });
+
+        function switchMarketTab(tabId) {
+            closeSidebar();
+            const originalTab = document.getElementById(tabId);
+            if(originalTab) originalTab.click();
+            
+            document.querySelectorAll('.sidebar-menu-links .nav-tab-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            const sideTabMap = {
+                'tabHome': 'tabHomeSide',
+                'tabPost': 'tabPostSide',
+                'tabManage': 'tabManageSide',
+                'tabAdmin': 'tabAdminSide'
+            };
+            
+            const currentSideTab = document.getElementById(sideTabMap[tabId]);
+            if(currentSideTab) currentSideTab.classList.add('active');
+        }
+
+        // 🛡️ เช็คสถานะและควบคุมการซ่อน/แสดงแผงควบคุมแอดมินอัตโนมัติ
+        // บังคับเช็คสถานะและควบคุมการซ่อน/แสดงแผงควบคุมแอดมินอย่างเข้มงวด
+        setInterval(() => {
+            const currentName = document.getElementById('currentUserName')?.innerText || '-';
+            const userRoleBadge = document.getElementById('userRoleBadge');
+            const userInfoDisplay = document.getElementById('userInfoDisplay');
+            
+            const tabAdminNav = document.getElementById('tabAdmin');
+            // เปลี่ยนมาดักจับตัวครอบ Li ด้านนอกสุด
+            const tabAdminSideLi = document.getElementById('tabAdminSideLi');
+
+            const roleText = userRoleBadge ? userRoleBadge.innerText.trim() : '';
+
+            // กรณีที่ 1: มีการล็อกอินเข้าสู่ระบบอยู่
+            if (userInfoDisplay && userInfoDisplay.style.display !== 'none') {
+                document.getElementById('sidebarUserName').innerText = currentName;
+                document.getElementById('sidebarStatusText').innerText = roleText || 'ผู้ใช้งาน';
+                
+                document.getElementById('sideMenuLoginBtn').style.display = 'none';
+                document.getElementById('sideMenuRegisterBtn').style.display = 'none';
+                document.getElementById('sideMenuLogoutBtn').style.display = 'block';
+                document.getElementById('sideMenuDivider').style.display = 'none';
+                
+                // ตรวจสอบสถานะ 'ผู้ดูแล'
+                if(roleText.includes('ผู้ดูแล')) {
+                    document.getElementById('sidebarStatusText').style.background = '#d9383a';
+                    document.getElementById('sidebarStatusText').style.color = '#fff';
+                    
+                    // 🔓 แสดงผลให้แอดมินใช้งาน
+                    if (tabAdminNav) tabAdminNav.style.display = 'inline-flex';
+                    if (tabAdminSideLi) tabAdminSideLi.style.display = 'block';
+                } else {
+                    // 🔒 ล็อกอินแล้วแต่เป็นผู้ใช้ทั่วไป -> บังคับซ่อนทันที
+                    document.getElementById('sidebarStatusText').style.background = '#2979ff';
+                    document.getElementById('sidebarStatusText').style.color = '#fff';
+                    
+                    if (tabAdminNav) tabAdminNav.style.display = 'none';
+                    if (tabAdminSideLi) tabAdminSideLi.style.display = 'none';
+                }
+            } else {
+                // กรณีที่ 2: เป็นผู้เยี่ยมชม (ไม่ได้ล็อกอิน) -> บังคับซ่อนทั้งหมด
+                document.getElementById('sidebarUserName').innerText = 'ยังไม่ได้เข้าสู่ระบบ';
+                document.getElementById('sidebarStatusText').innerText = 'โหมดผู้เยี่ยมชม';
+                document.getElementById('sidebarStatusText').style.background = '#e1e4e6';
+                document.getElementById('sidebarStatusText').style.color = '#57606a';
+                
+                document.getElementById('sideMenuLoginBtn').style.display = 'block';
+                document.getElementById('sideMenuRegisterBtn').style.display = 'block';
+                document.getElementById('sideMenuLogoutBtn').style.display = 'none';
+                document.getElementById('sideMenuDivider').style.display = 'block';
+                
+                if (tabAdminNav) tabAdminNav.style.display = 'none';
+                if (tabAdminSideLi) tabAdminSideLi.style.display = 'none';
+            }
+        }, 1000);
+    </script>
+    <script type="module" src="market.js"></script>
+</body>
+</html>

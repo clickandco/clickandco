@@ -570,6 +570,7 @@ body {
 
 /* 🛠️ เพิ่มสถานะเมื่อสั่งเปิด Overlay (เรียกใช้ผ่าน JavaScript เช่น overlay.classList.add('active')) */
 .modal-overlay.active {
+    display: flex !important; /* ใช้ !important เพื่อไปหักล้าง display: none ที่เขียนฝังใน HTML */
     opacity: 1;
     pointer-events: auto;
 }

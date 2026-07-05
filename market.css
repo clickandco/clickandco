@@ -1,0 +1,672 @@
+/* ☀️ Click&Co Market - Premium Light Theme Variables */
+:root {
+    --bg-app: #f6f8fa;          
+    --card-bg: #ffffff;         
+    --card-border: #e1e4e6;     
+    --accent-color: #00c853;    
+    --text-main: #24292f;       
+    --text-muted: #57606a;      
+    --input-bg: #f8f9fa;        
+    --shadow-sm: 0 2px 8px rgba(140, 152, 164, 0.1);
+    --shadow-md: 0 8px 24px rgba(140, 152, 164, 0.15);
+}
+
+* {
+    box-sizing: border-box;
+    font-family: 'Kanit', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-app);
+    color: var(--text-main);
+    min-height: 100vh;
+    background-image: radial-gradient(circle at 50% 0%, #edf1f5 0%, #f6f8fa 70%);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+/* --- 🌐 โครงสร้าง Navbar เมนูซ้ายบน ปุ่มขวาบนสไตล์พรีเมียม --- */
+.market-navbar {
+    background-color: var(--card-bg);
+    border-bottom: 1px solid var(--card-border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow-sm);
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.nav-tabs-left {
+    display: flex;
+    list-style: none;
+    gap: 5px;
+}
+
+.nav-tab-item {
+    padding: 18px 20px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-bottom: 3px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-tab-item:hover {
+    color: var(--text-main);
+    background-color: rgba(0,0,0,0.02);
+}
+
+.nav-tab-item.active {
+    color: var(--text-main);
+    border-bottom-color: var(--text-main);
+    font-weight: 600;
+}
+
+/* --- 🔐 ปุ่มล็อกอิน / สมัครสมาชิก ขวาบน --- */
+.auth-actions-right {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.btn-user-auth {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    color: var(--text-main);
+    padding: 8px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: var(--shadow-sm);
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-user-auth:hover {
+    border-color: var(--text-main);
+    background-color: #fafbfc;
+}
+
+.btn-user-auth.register {
+    background-color: var(--text-main);
+    color: #ffffff;
+    border-color: var(--text-main);
+}
+
+.btn-user-auth.register:hover {
+    background-color: #0f1115;
+}
+
+/* --- 🏷️ แถบข้อมูล User Profile ขวาบน --- */
+.user-profile-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: #fafbfc;
+    padding: 6px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--card-border);
+}
+
+.user-role-badge {
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background-color: #00c853;
+}
+
+.user-meta-details {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.3;
+}
+
+.user-meta-details strong {
+    font-size: 0.9rem;
+    color: var(--text-main);
+}
+
+.user-meta-details small {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.btn-logout-icon {
+    background: none;
+    border: none;
+    color: #ff4d4d;
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 5px;
+    transition: transform 0.2s;
+}
+
+.btn-logout-icon:hover {
+    transform: scale(1.1);
+}
+
+/* --- 🏠 หัวข้อและเนื้อหาแต่ละส่วน --- */
+.market-header-title {
+    margin-bottom: 25px;
+}
+
+.market-header-title h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 5px;
+}
+
+.market-header-title p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+.market-section {
+    display: none;
+}
+
+.market-section.active {
+    display: block;
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* --- 📝 โครงสร้างฟอร์มลงประกาศ --- */
+.user-post-box {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: var(--shadow-sm);
+}
+
+.form-title-header {
+    margin-bottom: 25px;
+    border-bottom: 1px solid #e1e4e6;
+    padding-bottom: 12px;
+}
+
+.form-title-header h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.form-title-header p {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.market-post-form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group.full-width {
+    grid-column: span 2;
+}
+
+.form-group label {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    height: 45px;
+    padding: 0 15px;
+    border-radius: 10px;
+    border: 1px solid var(--card-border);
+    background-color: var(--input-bg);
+    font-size: 0.95rem;
+    transition: all 0.2s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--text-main);
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(36, 41, 47, 0.08);
+}
+
+.btn-submit-post {
+    width: 100%;
+    height: 48px;
+    background-color: var(--text-main);
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-submit-post:hover {
+    background-color: #0f1115;
+}
+
+/* --- 🌐 Grid แสดงการ์ดรายการสินค้า --- */
+.market-products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+}
+
+.product-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.3s ease, box-shadow 0.3s;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+}
+
+.product-img-box {
+    position: relative;
+    width: 100%;
+    padding-top: 75%;
+    background: #f1f3f5;
+    overflow: hidden;
+}
+
+.product-img-box img {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+}
+
+.product-info {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.seller-name {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+
+.product-title {
+    font-size: 1.05rem;
+    font-weight: 500;
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+
+.product-footer {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid #f1f3f5;
+}
+
+.product-price {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--accent-color);
+}
+
+.visit-link-text {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+/* --- 🔐 กล่องหน้าต่าง Popup Modal --- */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 100000 !important; /* 🔥 แก้ไขจุดนี้: เปลี่ยนจาก 999 เป็น 100000 เพื่อให้อยู่เหนือทุกสิ่ง */
+}
+
+.glass-modal {
+    background: #ffffff;
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 440px;
+    padding: 30px;
+    box-shadow: var(--shadow-md);
+    position: relative;
+
+    /* 🛠️ เพิ่ม 3 บรรทัดนี้เพื่อแก้ปัญหาฟอร์มทะลุขอบหน้าจอ */
+    max-height: 90vh;          /* จำกัดความสูงกล่องไม่ให้เกิน 90% ของความสูงหน้าจอ */
+    overflow-y: auto;          /* ถ้าเนื้อหายาวเกิน ให้เปิดแถบเลื่อน Scrollbar แนวตั้งเฉพาะในกล่อง */
+    scrollbar-width: thin;     /* ปรับขนาดแถบเลื่อนให้เล็กสวยงาม (สำหรับ Firefox) */
+}
+
+/* ตกแต่งแถบเลื่อนแนวตั้งสำหรับกล่อง Modal */
+.glass-modal::-webkit-scrollbar {
+    width: 6px;
+}
+.glass-modal::-webkit-scrollbar-track {
+    background: transparent;
+}
+.glass-modal::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+.glass-modal::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.close-modal-btn {
+    position: absolute;
+    top: 15px; right: 20px;
+    background: none; border: none;
+    color: var(--text-muted);
+    font-size: 2rem; cursor: pointer;
+}
+
+.auth-sub-form h3 {
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.notice-text {
+    color: #b76e00;
+    background-color: #fff8eb;
+    border: 1px solid #ffebc6;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    margin-bottom: 15px;
+}
+
+.modal-style-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.modal-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.modal-form-group label {
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.modal-form-group input {
+    height: 42px;
+    padding: 0 12px;
+    border-radius: 8px;
+    border: 1px solid var(--card-border);
+    background-color: #fafbfc;
+    font-size: 0.95rem;
+}
+
+.modal-form-row {
+    display: flex;
+    gap: 12px;
+}
+
+.modal-form-row .modal-form-group {
+    flex: 1;
+}
+
+.modal-submit-btn {
+    height: 44px;
+    background-color: var(--text-main);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.switch-form-text {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.auth-alert-placeholder {
+    text-align: center;
+    padding: 50px 20px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    max-width: 450px;
+    margin: 40px auto;
+}
+
+.auth-alert-placeholder i {
+    font-size: 2.5rem;
+    color: var(--text-muted);
+    margin-bottom: 15px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-popup { animation: fadeIn 0.25s ease-out; }
+
+@media (max-width: 768px) {
+    .nav-container { flex-direction: column; padding: 10px; gap: 10px; }
+    .nav-tabs-left { width: 100%; justify-content: space-around; flex-wrap: wrap; }
+    .nav-tab-item { padding: 12px 10px; font-size: 0.85rem; }
+    .modal-form-row { flex-direction: column; gap: 14px; }
+}
+
+.btn-back-home:hover {
+    background: rgba(0, 0, 0, 0.1) !important;
+    transform: translateX(-2px);
+}
+
+/* บังคับให้เมนูแต่ละอันเป็นบรรทัดเดียว ไม่ล็อกให้ข้อความตัดขึ้นบรรทัดใหม่ */
+.nav-tab-item {
+    white-space: nowrap !important; /* ห้ามข้อความตัดคำขึ้นบรรทัดใหม่ */
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important; /* จัดระยะห่างระหว่างไอคอนกับข้อความให้สวยงาม */
+}
+
+/* เพิ่มเติม: ป้องกันไม่ให้แถวเมนูทั้งหมดหดตัวจนเบียดกันเกินไป */
+.nav-tabs-left {
+    display: flex !important;
+    flex-wrap: nowrap !important; /* ห้ามเมนูแยกแถว */
+    align-items: center !important;
+    gap: 15px !important; /* ระยะห่างระหว่างแต่ละเมนู */
+}
+
+/* ตกแต่งสไตล์ของรายการลิงก์ในเมนูด้านข้าง (Sidebar Menu) */
+.sidebar-menu-links li a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    text-decoration: none;
+    font-size: 0.95rem;
+    border-radius: 10px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    color: #24292f;
+}
+
+.sidebar-menu-links li a:hover {
+    background: rgba(0, 0, 0, 0.05);
+    transform: translateX(4px);
+}
+
+/* เมื่อแท็บนั้นกำลังเปิดใช้งานอยู่ (Active) ให้ขึ้นไฮไลท์สีเข้ม */
+.sidebar-menu-links li a.active {
+    background: #24292f !important;
+    color: #fff !important;
+}
+
+.btn-back-home:hover {
+    background: #e1e4e6 !important;
+}
+
+#btnOpenMarketSidebar:hover {
+    background: #e1e4e6 !important;
+}
+
+/* ==========================================================================
+   🔄 RESPONSIVE & SCREEN OPTIMIZATION OVERRIDES (ต่อท้ายไฟล์เพื่อรองรับทุกหน้าจอ)
+   ========================================================================== */
+
+/* --- 📱 1. จัดการ Layout ส่วนหัวและ Navbar ให้ยืดหยุ่นในมือถือ --- */
+@media (max-width: 991px) {
+    .container {
+        margin: 15px auto;
+        padding: 0 15px;
+    }
+    
+    .market-post-form {
+        grid-template-columns: 1fr; /* ปรับฟอร์มลงประกาศจาก 2 คอลัมน์เป็น 1 คอลัมน์ */
+        gap: 15px;
+    }
+
+    .form-group.full-width {
+        grid-column: span 1;
+    }
+}
+
+@media (max-width: 768px) {
+    /* ปรับ Navbar ของเดิมให้เป็นแบบแถวตั้งอัตโนมัติและไม่เบียดกัน */
+    .nav-container {
+        flex-direction: column !important;
+        padding: 10px 15px !important;
+        gap: 12px !important;
+        align-items: stretch !important;
+    }
+
+    /* แก้ปัญหาแถบเมนูซ้ายแนวนอนยาวทะลุจอ โดยเปิดให้เลื่อนซ้าย-ขวาได้ (Horizontal Scroll) */
+    .nav-tabs-left {
+        width: 100% !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        padding-bottom: 5px !important;
+        justify-content: flex-start !important;
+        -webkit-overflow-scrolling: touch; /* เลื่อนลื่นบน iOS */
+        scrollbar-width: none; /* ซ่อนแถบเลื่อน (Firefox) */
+    }
+    
+    .nav-tabs-left::-webkit-scrollbar {
+        display: none; /* ซ่อนแถบเลื่อน (Chrome, Safari) */
+    }
+
+    .nav-tab-item {
+        padding: 10px 14px !important;
+        font-size: 0.85rem !important;
+        flex-shrink: 0; /* ป้องกันไม่ให้เมนูหดตัว */
+    }
+
+    /* ปรับปุ่มเซ็ต Auth / Profile ขวาบนให้แสดงผลสวยงามเต็มกว้าง */
+    .auth-actions-right, 
+    .user-profile-status {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+
+    .btn-user-auth {
+        flex: 1;
+        justify-content: center;
+        padding: 10px 14px !important;
+    }
+    
+    .user-profile-status {
+        justify-content: space-between !important;
+    }
+
+    /* Grid รายการสินค้าปรับเป็น 1-2 คอลัมน์ตามความกว้าง */
+    .market-products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important;
+        gap: 15px !important;
+    }
+}
+
+/* --- 📲 2. ปรับปรุงขนาดสำหรับหน้าจอมือถือขนาดเล็กมาก (เช่น iPhone SE) --- */
+@media (max-width: 375px) {
+    .nav-tab-item {
+        padding: 8px 10px !important;
+        font-size: 0.8rem !important;
+    }
+
+    .product-price {
+        font-size: 1.15rem !important;
+    }
+
+    .glass-modal {
+        padding: 20px 15px !important;
+    }
+}
+
+/* --- 🖥️ 3. จัดการ Layout หน้าจอขนาดใหญ่พิเศษ (Ultra-wide PC) ไม่ให้ขยายกว้างจนเสียทรง --- */
+@media (min-width: 1400px) {
+    .container, 
+    .nav-container {
+        max-width: 1320px !important; /* เพิ่มความกว้างสูงสุดเล็กน้อยให้ดูพรีเมียมบนจอใหญ่ */
+    }
+}
+
+/* --- 🛠️ 4. บั๊กฟิกซ์เพิ่มเติมความสมบูรณ์แบบ --- */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+input, button, select, textarea {
+    font-family: inherit; /* บังคับให้ใช้ Font 'Kanit' ในทุกองค์ประกอบแบบเสถียร */
+}
+
+/* แก้ไขปีกกาปิดที่เกินมาในโค้ดเดิมตอนท้าย */
+.btn-back-home:hover { background: #e1e4e6 !important; }
+#btnOpenMarketSidebar:hover { background: #e1e4e6 !important; }

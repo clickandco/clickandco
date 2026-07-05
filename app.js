@@ -899,7 +899,7 @@ document.getElementById('loginForm').onsubmit = async function(e) {
     } catch (error) {
         console.error("Firebase Login Error: ", error);
         if (error.code === 'auth/invalid-email') {
-            alert('รูปแบบอีเมลไม่ถูกต้อง!');
+            alert('เข้าสู่ระบบผิดพลาด');
         } else if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
             alert('อีเมล หรือ รหัสผ่านไม่ถูกต้อง!');
         } else {
@@ -1736,4 +1736,130 @@ document.addEventListener('DOMContentLoaded', () => {
             isScrolling = true;
         }
     }, { passive: true }); // passive: true ช่วยให้ Scroll Wheel ทำงานได้ทันที ไม่เกิดอาการค้างหรือล็อก
+});
+
+// นำเข้าฟังก์ชันดึงข้อมูลแบบ Real-time เพิ่มเติมที่บรรทัดบนสุดของไฟล์ (ถ้าระบบยังไม่มี)
+import { onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+// --- 👑 ฟังก์ชันฟังข้อมูลการสมัครสมาชิกค้างรอการอนุมัติ (Real-time Listener) ---
+function listenPendingUsers() {
+    const checkUserCollection = collection(db, "checkuser");
+    
+    onSnapshot(checkUserCollection, (snapshot) => {
+        const countSpan = document.getElementById('pendingUserCount'); // สัญลักษณ์ตัวเลขเตือน (ถ้ามี)
+        const container = document.getElementById('pendingUsersContainer'); // กล่องรับรายชื่อใน index.html
+        const count = snapshot.size;
+
+        if (countSpan) {
+            if (count > 0) {
+                countSpan.innerText = count;
+                countSpan.style.display = 'inline-block';
+            } else {
+                countSpan.style.display = 'none';
+            }
+        }
+
+        if (container) {
+            if (count === 0) {
+                container.innerHTML = `<div style="text-align:center; color:#aaa; padding:20px;">ไม่มีข้อมูลผู้สมัครที่รอการอนุมัติ</div>`;
+                return;
+            }
+
+            let html = "";
+            snapshot.forEach((userDoc) => {
+                const user = userDoc.data();
+                html += `
+                    <div class="pending-user-card" style="border: 1px solid #e1e4e6; padding: 15px; border-radius: 8px; background: #f8f9fa; margin-bottom: 10px; color: #24292f;">
+                        <p style="margin: 0 0 5px 0;"><strong>Username:</strong> <span style="color:#d9383a; font-weight: 600;">${user.username}</span></p>
+                        <p style="margin: 0 0 5px 0;"><strong>Email:</strong> ${user.email || 'ไม่ได้ระบุ'}</p>
+                        <p style="margin: 0 0 5px 0;"><strong>Facebook:</strong> ${user.facebook || 'ไม่ได้ระบุ'}</p>
+                        <p style="margin: 0 0 12px 0;"><strong>Phone:</strong> ${user.phone || 'ไม่ได้ระบุ'}</p>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn-approve" data-user="${user.username}" data-pass="${user.password}" data-fb="${user.facebook || ''}" data-email="${user.email || ''}" data-phone="${user.phone || ''}" style="flex: 1; padding: 8px; background: #00c853; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 500;">อนุมัติ</button>
+                            <button class="btn-reject" data-user="${user.username}" style="flex: 1; padding: 8px; background: #d9383a; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 500;">ปฏิเสธ</button>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+
+            // ผูก Event ให้ปุ่มกดอนุมัติ/ปฏิเสธทำงานได้
+            addApproveEvents();
+        }
+    });
+}
+
+// ฟังก์ชันดักจับปุ่ม อนุมัติ และ ปฏิเสธ ในหน้าต่าง Popup
+function addApproveEvents() {
+    // ปุ่มอนุมัติ
+    document.querySelectorAll('.btn-approve').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            // ใช้ currentTarget เพื่อล็อกตำแหน่ง Attribute ไว้ที่แท็ก button เสมอ แม้แอดมินคลิกโดนช่องว่างในปุ่ม
+            const username = e.currentTarget.getAttribute('data-user');
+            const password = e.currentTarget.getAttribute('data-pass');
+            const facebook = e.currentTarget.getAttribute('data-fb');
+            const email = e.currentTarget.getAttribute('data-email');
+            const phone = e.currentTarget.getAttribute('data-phone');
+
+            try {
+                // 1. เขียนข้อมูลผู้ใช้ชุดนี้ไปที่ database หลัก "market_users" เพื่อให้ใช้ล็อกอินได้ทันที
+                await setDoc(doc(db, "market_users", username), {
+                    username: username,
+                    password: password,
+                    facebook: facebook || "ไม่ได้ระบุ",
+                    email: email || "ไม่ได้ระบุ",
+                    phone: phone || "ไม่ได้ระบุ",
+                    role: "user",
+                    status: "approved",
+                    approvedAt: new Date().getTime() // เปลี่ยนเป็น timestamp เพื่อให้ดึงไปเรียงลำดับเวลาได้ง่าย
+                });
+
+                // 2. ลบชื่อออกจากคอลเลกชันพักข้อมูล "checkuser"
+                await deleteDoc(doc(db, "checkuser", username));
+                alert(`🎯 อนุมัติผู้ใช้งาน บัญชี: ${username} เรียบร้อยแล้ว!`);
+
+            } catch (err) {
+                console.error("Approve Error: ", err);
+                alert("เกิดข้อผิดพลาดในการอนุมัติ: " + err.message);
+            }
+        });
+    });
+
+    // ปุ่มปฏิเสธ (ลบข้อมูลทิ้ง)
+    document.querySelectorAll('.btn-reject').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            const username = e.currentTarget.getAttribute('data-user');
+
+            if (confirm(`คุณแน่ใจหรือไม่ที่จะปฏิเสธและลบคำขอของ "${username}"?`)) {
+                try {
+                    // ลบออกจาก checkuser ทันที
+                    await deleteDoc(doc(db, "checkuser", username));
+                    alert("🗑️ ลบข้อมูลคำขอสมัครเรียบร้อยแล้ว");
+                } catch (err) {
+                    console.error("Reject Error: ", err);
+                    alert("เกิดข้อผิดพลาดในการลบข้อมูล: " + err.message);
+                }
+            }
+        });
+    });
+}
+
+// --- 🧭 ระบบสลับควบคุมเปิด/ปิดป๊อปอัปแอดมิน (แก้ไข ID ให้ตรงกับ index.html) ---
+document.addEventListener("DOMContentLoaded", () => {
+    // แก้ไขเป็น ID "userApproveModal" ตามที่มีอยู่ใน index.html ของคุณ
+    const approveModal = document.getElementById('userApproveModal'); 
+    
+    // คลิกเปิดเมนูอนุมัติสมาชิก (อ้างอิง ID ปุ่มจริงในเมนูแอดมินของคุณ)
+    document.getElementById('btnOpenUserApproveModal')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        openModal('userApproveModal'); //  เรียกใช้ฟังก์ชันหลักของระบบ เพื่อเพิ่มคลาส .active
+    });
+
+    // คลิกปุ่มกากบาทเพื่อปิด Popup
+    document.getElementById('btnCloseApproveModal')?.addEventListener('click', () => {
+        closeModal('userApproveModal'); //  เรียกใช้ฟังก์ชันหลักของระบบ เพื่อถอดคลาส .active ออก
+    });
+
+    // เริ่มทำงานระบบ Real-time ดึงคนสมัครสมาชิกค้างรอตรวจ (0)
+    listenPendingUsers();
 });
